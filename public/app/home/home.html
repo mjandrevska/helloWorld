@@ -1,0 +1,148 @@
+<div class="container-fluid">
+	<div class="row">
+		<nav class="homepageHeader">
+			<div class="row">
+				<div class="col-md-2"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-2">
+					<a class="btn btn-default homepageBtn" type="button" data-toggle="modal" data-target="#loginModal">Log In</a>
+
+					<!-- Login Modal -->
+					<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+									<h4 class="modal-title text-center" id="loginModalLabel">LOG IN</h4>
+								</div>
+								<div class="modal-body">
+									<div class="row">
+										<div class="col-md-2"></div>
+										<div class="col-md-8">
+											<form>
+												<div class="form-group">
+													<label for="username">Your Username</label>
+													<input type="username" class="form-control" id="loginUsername">
+												</div>
+												<div class="form-group">
+													<label for="password">Your Password</label>
+													<input type="password" class="form-control" id="loginPassword">
+												</div>
+												<div>
+													<div class="col-md-4"></div>
+													<button type="submit" class="btn btn-default modalBtn col-md-4" id="loginButton" onclick="clickLoginButton()">LOG IN</button>
+													<div class="col-md-4"></div>	
+												</div>
+											</form>
+										</div>
+										<div class="col-md-2"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-2">
+					<a class="btn btn-default homepageBtn" type="button" data-toggle="modal" data-target="#signUpModal">Sign Up</a>
+
+					<!-- SignUpModal Modal -->
+					<div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+									<h4 class="modal-title text-center" id="loginModalLabel">SIGN UP</h4>
+								</div>
+								<div class="modal-body-signUp">
+									<div class="row">
+										<div class="col-md-2"></div>
+										<div class="col-md-8">
+											<form>
+												<div class="form-group">
+													<label for="signUpName">Your Name</label>
+													<input type="name" class="form-control" id="signUpName">
+												</div>
+												<div class="form-group">
+													<label for="signUpSurname">Your Surname</label>
+													<input type="name" class="form-control" id="signUpSurname">
+												</div>
+												<div class="form-group">
+													<label for="signUpEmail">Your Email</label>
+													<input type="email" class="form-control" id="signUpEmail">
+												</div>
+												<div class="form-group">
+													<label for="signUpUsername">Your Username</label>
+													<input type="username" class="form-control" id="signUpUsername">
+												</div>
+												<div class="form-group">
+													<label for="signUpPassword">Your Password</label>
+													<input type="password" class="form-control" id="signUpPassword">
+												</div>
+												<div>
+													<div class="col-md-4"></div>
+													<button type="submit" class="btn btn-default modalBtn col-md-4" id="signupButton" onclick="clickSignUpButton()">SIGN UP</button>
+													<div class="col-md-4"></div>	
+												</div>
+											</form>
+										</div>
+										<div class="col-md-2"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+	</div>
+
+	<!-- Background image -->
+	<div class="row homepageBackground">
+		<img src="../img/frontpage.jpg" class="bg">
+	</div>
+
+	<!-- Wizard -->
+	<div class="row homepageWizard">
+		<div class="homepageTitle text-center">How to use it</div>
+		<div class="numberWizard text-center">
+			<img src="../img/1.png">
+			<div>Get notified</div>
+		</div>
+	</div>
+
+	<!--Your ideas are welcome -->
+	<div class="row feedbackForm">
+		<div class="homepageTitle text-center">Your ideas are welcome!</div>
+		<div class="row homepageForm">	
+			<div class="col-md-4"></div>
+			<div class="col-md-4">
+				<form>
+					<div class="form-group">
+						<label for="name">Your Name</label>
+						<input type="name" class="form-control" id="name">
+					</div>
+					<div class="form-group">
+						<label for="email">Your Email</label>
+						<input type="email" class="form-control" id="email">
+					</div>
+					<div class="form-group">
+						<label for="message">Message</label>
+						<textarea class="form-control" rows="3"></textarea>
+					</div>
+					<a href="#"><button type="submit" class="btn btn-default homepageSubmitBtn">Submit</button></a>
+				</form>
+			</div>
+			<div class="col-md-4"></div>
+		</div>
+	</div>
+
+	<!--Footer -->
+	<div class="row footer">
+		<div class="socialMediaIcons text-center">
+			<a href="#"><img src="../img/github.png" class="githubIcon"></a>
+			<a href="#"><img src="../img/twitter.png" class="twitterIcon"></a>
+		</div>
+		<p class="footerText text-center">Licensed under the MIT Licence<br />
+			Copyright &#169; 2016 Monika Jandrevska</p>
+	</div>
+</div>

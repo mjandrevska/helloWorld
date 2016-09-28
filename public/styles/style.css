@@ -1,0 +1,237 @@
+html{
+	height: 100%;
+}
+body{
+	font-family: 'Open Sans', 'Helvetica Neue', 'Times New Roman';
+	overflow-x: hidden;
+	height: 100%;
+}
+
+.friendsListContainer{
+	height: 100%;
+}
+
+.friendsListRow{
+	height: 100%;
+}
+.homepageHeader{
+	background-color: #1BBC9B;
+}
+.homepageBtn{
+	color: #FFF;
+	background-color: #E64C66;
+	border-radius: 4px;
+	text-transform: uppercase;
+	padding-right: 40px;
+	padding-left: 40px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	border: 0px;
+}
+.homepageBackground{
+	background-image: url('../img/frontpage.jpg') no-repeat center center;
+	background-size: contain;
+}
+
+.bg{
+	width: 100%;
+}
+
+.modalBtn{
+	border: 0px;
+	color: #FFF;
+	background-color: #1BBC9B;
+	text-transform: uppercase;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border-radius: 4px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.modal-header{
+	border: 0px;
+}
+
+.modal-body{
+	height: 250px;
+}
+
+.modal-body-signUp{
+	height: 450px;
+}
+
+.modal-content{
+	border: 1px solid #E64C66;
+}
+
+.homepageTitle{
+	color: #2D3E50;
+	font-size: 35px;
+	font-weight: bold;
+	margin-top: 20px;
+}
+
+.headerIcon{
+	padding-right: 30px;
+	padding-top: 5px;
+}
+
+.homepageWizard{
+	background-color: #FFF;
+}
+
+.numberWizard{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.homepageSubmitBtn{
+	background-color: #E64C66;
+	border-radius: 4px;
+	border: 0px;
+	color: #FFF;
+	text-transform: uppercase;
+	padding-left: 40px;
+	padding-right: 40px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.feedbackForm{
+	border-top: 1px solid #AEAEAE;
+}
+
+.homepageForm{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.footer{
+	background-color: #2D3E50;
+}
+
+.footerText{
+	color: #ACB6C6;
+}
+
+.socialMediaIcons{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.githubIcon{
+	margin-right: 25px;
+}
+
+.listHeader{
+	background-color: #1BBC9B;
+}
+
+.listTitle{
+	font-size: 26px;
+	color: #FFF;
+	display: inline-block;
+	padding-left: 45px;
+}
+
+img.friendsListIcon{
+	margin-left: 15px;
+	padding: 10px;
+}
+
+.messageHeader{
+	background-color: #18a689;
+}
+
+.firstMessageText{
+	background-color: #1BBC9B;
+	color: #FFF;
+}
+
+.secondMessageText{
+	background-color: #cccccc;
+}
+
+.messageTime{
+	color: #999999;
+}
+.messageTitle{
+	color: #FFF;
+	font-size: 26px;
+	padding-top: 5px;
+	padding-left: 35px;
+	padding-bottom: 10px;
+}
+
+.messageIcons{
+	padding-top: 5px;
+}
+
+.friendsList{
+	background-color: #FFF;
+	height: 100%;
+}
+
+.messagePanel{
+	background-color: #F2F2F2;
+	height: 100%;
+}
+
+.friendName{
+	margin-top: 20px;
+	margin-bottom: 25px;
+	font-size: 16px;
+	color: #000;
+}
+
+a:hover, a:visited, a:active, a:focus{
+	text-decoration: none;
+}
+
+.media-object{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.media-list li{
+	border-bottom: 1px solid #1BBC9B;
+}
+
+.media{
+	margin-top: 0px;
+}
+
+.messageSendBtn{
+	background-color: #E64C66;
+	border-radius: 4px;
+	border: 0px;
+	color: #FFF;
+	text-transform: uppercase;
+	padding-left: 40px;
+	padding-right: 40px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin-top: 15px;
+}
+
+.firstMessage{
+	margin-top: 20px;
+	margin-bottom: 30px;
+}
+
+.secondMessage{
+	margin-bottom: 30px;
+}
+
+.messagePlaceholder{
+	border: 1px solid #E6E6E6;
+}
+
+.active{
+	background-color: #F2F2F2;
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html ng-app="helloWorldApp">
+<head>
+	<meta charset="utf-8">
+	<title>Hello World</title>
+</head>
+<body>
+	<ng-view></ng-view>
+	<script type="text/javascript" src="/lib/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/lib/angular/angular.min.js"></script>
+	<script type="text/javascript" src="/lib/angular-route/angular-route.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/lib/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="/styles/style.css">
+	<script type="text/javascript" src="app/home/HomeCtrl.js"></script>
+	<script type="text/javascript" src="app/app.js"></script>
+	<script type="text/javascript">
+		$('#loginModal').on('shown.bs.modal', function () {
+  			$('#myInput').focus();
+		});
+	</script>
+	<script type="text/javascript">
+		$('#signUpModal').on('shown.bs.modal', function () {
+  			$('#myInput').focus();
+		});
+	</script>
+</body>
+</html>
