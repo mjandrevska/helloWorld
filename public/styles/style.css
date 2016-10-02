@@ -65,6 +65,9 @@ body{
 	height: 550px;
 }
 
+.modal-body-login{
+	height: 270px;
+}
 .modal-content{
 	border: 1px solid #E64C66;
 }

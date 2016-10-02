@@ -55,7 +55,7 @@ var usernameValidator = [
 var passwordValidator = [
 	validate({
 		validator: 'isLength',
-		arguments: [6,20],
+		arguments: [6,100],
 		message: 'The password should be longer than {ARGS[0]} and smaller than {ARGS[1]} characters'
 	}),
 	validate({
@@ -121,22 +121,28 @@ var sha512 = function(password, salt){
     var hash = crypto.createHmac('sha512', salt); 
     hash.update(password);
     var value = hash.digest('hex');
-    return {
-        salt:salt,
-        passwordHash:value
-    };
+    return value;
 };
 
-function saltHashPassword(userpassword) {
-    var salt = genRandomString(16); /** Gives us salt of length 16 */
-    var passwordData = sha512(userpassword, salt);
-    console.log('UserPassword = '+userpassword);
-    console.log('Passwordhash = '+passwordData.passwordHash);
-    console.log('\nSalt = '+passwordData.salt);
-}
 
-saltHashPassword('PASSWORD');
+userSchema.pre('save', function(next){
+	if(this.isModified('password')){
+		this.salt = genRandomString(16); 
+    	this.password = sha512(this.password, this.salt);	
+	}
+	next();
+});
 
+userSchema.methods.getClean = function(){
+	var user = this.toObject();
+	delete user.password;
+	delete user.salt;
+	return user;
+};
+
+userSchema.methods.checkValidPassword = function(password){
+	return (this.password === sha512(password, this.salt));
+};
 
 var Users = mongoose.model('User', userSchema);
 module.exports = Users;

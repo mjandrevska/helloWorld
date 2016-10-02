@@ -1,4 +1,5 @@
 var passport = require('passport');
+var crypto = require('crypto');
 
 //Model
 var Users = require('../models/user');
@@ -7,9 +8,11 @@ var Users = require('../models/user');
 var userRouter = require('../routes/user');
 
 module.exports = {
+
 	create: function(req, res, next){
 		var user;
 		console.log('POST');
+		console.log(req.body);
 		console.log(req.body);
 		user = new Users({
 			name: req.body.name,
@@ -26,6 +29,7 @@ module.exports = {
 			}
 			else{
 				console.log('A new user is created using the Sign Up form');
+				user = user.getClean();
 				return res.send(user);
 			} 
 		});
@@ -118,14 +122,14 @@ module.exports = {
 				}
 				req.logIn(user, function(err) {
 					if (err) { return next(err); }
-					return res.status(200).send('Login successful');
+					user = user.getClean();
+					return res.status(200).send(user);
 				});
 			}
 		})(req, res, next);
 	},
 
 	logout:  function(req, res, next){
-		//var name = req.user.username;
 		console.log('log out');
 		req.logout();
 		res.status(200).send('User logout successful');

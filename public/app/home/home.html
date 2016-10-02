@@ -15,23 +15,41 @@
 									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 									<h4 class="modal-title text-center" id="loginModalLabel">LOG IN</h4>
 								</div>
-								<div class="modal-body">
+								<div class="modal-body-login">
 									<div class="row">
 										<div class="col-md-2"></div>
 										<div class="col-md-8">
 											<form>
 												<div class="form-group">
 													<label for="username">Your Username</label>
-													<input type="username" class="form-control" id="loginUsername">
+													<input type="username" class="form-control" id="loginUsername" ng-model="user.username">
 												</div>
 												<div class="form-group">
 													<label for="password">Your Password</label>
-													<input type="password" class="form-control" id="loginPassword">
+													<input type="password" class="form-control" id="loginPassword" ng-model="user.password">
 												</div>
 												<div>
 													<div class="col-md-4"></div>
 													<button type="submit" class="btn btn-default modalBtn col-md-4" id="loginButton" ng-click="login()">LOG IN</button>
 													<div class="col-md-4"></div>	
+												</div>
+												<div class="col-md-12">
+													<div class="checkCredentials" ng-if="!validUsername">
+														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> Please enter the correct username</span>
+														<span class="sr-only">Error:</span>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<div class="checkCredentials" ng-if="!validPassword">
+														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> Please enter the correct password</span>
+														<span class="sr-only">Error:</span>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<div class="checkCredentials" ng-if="!validInputs">
+														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> Please enter the correct credentials</span>
+														<span class="sr-only">Error:</span>
+													</div>
 												</div>
 											</form>
 										</div>

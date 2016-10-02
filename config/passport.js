@@ -9,7 +9,7 @@ var Users = require('../app/models/user');
 
 //Setting Passport
 passport.use(new LocalStrategy( function(username, password, done) {
-	Users.findOne({ username: username, password: password }, function(err, user) {
+	Users.findOne({ username: username}, function(err, user) {
     	if (err){ 
     		return done(err); 
     	}
@@ -18,7 +18,12 @@ passport.use(new LocalStrategy( function(username, password, done) {
         	return done(null, false, { message: 'Incorrect username or password' });
       	}
       	
-      	return done(null, user);
+        if(user.checkValidPassword(password)){
+          return done(null, user);
+        }
+        else{
+          return done(null, false, { message: 'Incorrect username or password' }); 
+        }
     });
 }));
 
