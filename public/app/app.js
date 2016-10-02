@@ -2,8 +2,8 @@ var helloWorldControllers = angular.module('helloWorldApp.controllers',[]);
 var helloWorldAppServices = angular.module('helloWorldApp.services',[]);
 require('./home/HomeCtrl.js')(helloWorldControllers);
 require('./home/HomeService.js')(helloWorldAppServices);
-require('./profile/ProfileCtrl.js')(helloWorldControllers);
-require('./profile/ProfileService.js')(helloWorldAppServices);
+require('./chat/ChatCtrl.js')(helloWorldControllers);
+require('./chat/ChatService.js')(helloWorldAppServices);
 angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWorldApp.services'])
 .config(function($routeProvider){
 	$routeProvider
@@ -11,9 +11,9 @@ angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWo
 		templateUrl: "app/home/home.html", 
 		controller: "HomeCtrl"
 	})
-	.when("/profile", {
-		templateUrl: "app/profile/profile.html", 
-		controller: "ProfileCtrl"
+	.when("/chat", {
+		templateUrl: "app/chat/chat.html", 
+		controller: "ChatCtrl"
 	})
 	.otherwise({redirectTo: '/'});
 });

@@ -39,11 +39,10 @@ module.exports = function(module){
 			}
 
 			if($scope.validInputs){
-				alert('Hello World');
 				HomeService.createUser($scope.user)
 				.then(function(res){
 					console.log('Successful signup', res);
-					$window.location.href = '#/profile';
+					$window.location.href = '#/chat';
 					console.log(res);
 					console.log(res._id);
 				},

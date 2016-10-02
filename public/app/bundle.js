@@ -2265,8 +2265,8 @@ var helloWorldControllers = angular.module('helloWorldApp.controllers',[]);
 var helloWorldAppServices = angular.module('helloWorldApp.services',[]);
 require('./home/HomeCtrl.js')(helloWorldControllers);
 require('./home/HomeService.js')(helloWorldAppServices);
-require('./profile/ProfileCtrl.js')(helloWorldControllers);
-require('./profile/ProfileService.js')(helloWorldAppServices);
+require('./chat/ChatCtrl.js')(helloWorldControllers);
+require('./chat/ChatService.js')(helloWorldAppServices);
 angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWorldApp.services'])
 .config(function($routeProvider){
 	$routeProvider
@@ -2274,13 +2274,27 @@ angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWo
 		templateUrl: "app/home/home.html", 
 		controller: "HomeCtrl"
 	})
-	.when("/profile", {
-		templateUrl: "app/profile/profile.html", 
-		controller: "ProfileCtrl"
+	.when("/chat", {
+		templateUrl: "app/chat/chat.html", 
+		controller: "ChatCtrl"
 	})
 	.otherwise({redirectTo: '/'});
 });
-},{"./home/HomeCtrl.js":65,"./home/HomeService.js":66,"./profile/ProfileCtrl.js":67,"./profile/ProfileService.js":68}],65:[function(require,module,exports){
+},{"./chat/ChatCtrl.js":65,"./chat/ChatService.js":66,"./home/HomeCtrl.js":67,"./home/HomeService.js":68}],65:[function(require,module,exports){
+module.exports = function(module){
+	module.controller('ChatCtrl', ['$scope', '$route', function($scope, $route){
+		console.log('ChatCtrl');
+	}]);
+};
+
+},{}],66:[function(require,module,exports){
+module.exports = function(module){
+	module.factory('ChatService', ['$http', '$q', function($http, $q){
+		var service = {};
+		return service;
+	}]);
+};
+},{}],67:[function(require,module,exports){
 var validator  = require('validator');
 module.exports = function(module){
 	module.controller('HomeCtrl', ['$scope', '$route', 'HomeService','$window', function($scope, $route, HomeService, $window){
@@ -2322,11 +2336,10 @@ module.exports = function(module){
 			}
 
 			if($scope.validInputs){
-				alert('Hello World');
 				HomeService.createUser($scope.user)
 				.then(function(res){
 					console.log('Successful signup', res);
-					$window.location.href = '#/profile';
+					$window.location.href = '#/chat';
 					console.log(res);
 					console.log(res._id);
 				},
@@ -2341,7 +2354,7 @@ module.exports = function(module){
 	}]);
 };
 
-},{"validator":1}],66:[function(require,module,exports){
+},{"validator":1}],68:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('HomeService', ['$http', '$q', function($http, $q){
 		var service = {};
@@ -2364,18 +2377,4 @@ module.exports = function(module){
 	}]);
 };
 
-},{}],67:[function(require,module,exports){
-module.exports = function(module){
-	module.controller('ProfileCtrl', ['$scope', '$route', function($scope, $route){
-		console.log('profile Ctrl');
-	}]);
-};
-
-},{}],68:[function(require,module,exports){
-module.exports = function(module){
-	module.factory('ProfileService', ['$http', '$q', function($http, $q){
-		var service = {};
-		return service;
-	}]);
-};
 },{}]},{},[64]);
