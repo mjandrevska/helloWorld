@@ -30,7 +30,7 @@
 												</div>
 												<div>
 													<div class="col-md-4"></div>
-													<button type="submit" class="btn btn-default modalBtn col-md-4" id="loginButton" onclick="clickLoginButton()">LOG IN</button>
+													<button type="submit" class="btn btn-default modalBtn col-md-4" id="loginButton" ng-click="login()">LOG IN</button>
 													<div class="col-md-4"></div>	
 												</div>
 											</form>
@@ -60,28 +60,35 @@
 											<form>
 												<div class="form-group">
 													<label for="signUpName">Your Name</label>
-													<input type="name" class="form-control" id="signUpName">
+													<input type="name" class="form-control" id="signUpName" ng-model="user.name">
 												</div>
 												<div class="form-group">
 													<label for="signUpSurname">Your Surname</label>
-													<input type="name" class="form-control" id="signUpSurname">
+													<input type="name" class="form-control" id="signUpSurname" ng-model="user.surname">
 												</div>
 												<div class="form-group">
 													<label for="signUpEmail">Your Email</label>
-													<input type="email" class="form-control" id="signUpEmail">
+													<input type="email" class="form-control" id="signUpEmail" ng-model="user.email">
 												</div>
 												<div class="form-group">
 													<label for="signUpUsername">Your Username</label>
-													<input type="username" class="form-control" id="signUpUsername">
+													<input type="username" class="form-control" id="signUpUsername" ng-model="user.username">
 												</div>
 												<div class="form-group">
 													<label for="signUpPassword">Your Password</label>
-													<input type="password" class="form-control" id="signUpPassword">
+													<input type="password" class="form-control" id="signUpPassword" ng-model="user.password">
 												</div>
 												<div>
 													<div class="col-md-4"></div>
-													<button type="submit" class="btn btn-default modalBtn col-md-4" id="signupButton" onclick="clickSignUpButton()">SIGN UP</button>
+													<button type="submit" class="btn btn-default modalBtn col-md-4" id="signupButton" ng-click="signup()">SIGN UP</button>
 													<div class="col-md-4"></div>	
+												</div>
+												<div>
+													<p>User.name: {{user.name}}</p>
+													<p>User.surname: {{user.surname}}</p>
+													<p>User username: {{user.username}}</p>
+													<p>User email: {{user.email}}</p>
+													<p>User password: {{user.password}}</p>
 												</div>
 											</form>
 										</div>

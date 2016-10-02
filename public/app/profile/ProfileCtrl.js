@@ -1,4 +1,5 @@
-var hellowWorldApp = angular.module('helloWorldApp.controllers', [])
-.controller('ProfileCtrl', function($scope){
-	console.log('profile Ctrl');
-});
+module.exports = function(module){
+	module.controller('ProfileCtrl', ['$scope', '$route', function($scope, $route){
+		console.log('profile Ctrl');
+	}]);
+};
