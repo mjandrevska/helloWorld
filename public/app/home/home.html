@@ -64,7 +64,7 @@
 												</div>
 												<div class="form-group">
 													<label for="signUpSurname">Your Surname</label>
-													<input type="name" class="form-control" id="signUpSurname" ng-model="user.surname">
+													<input type="surname" class="form-control" id="signUpSurname" ng-model="user.surname">
 												</div>
 												<div class="form-group">
 													<label for="signUpEmail">Your Email</label>
@@ -82,6 +82,36 @@
 													<div class="col-md-4"></div>
 													<button type="submit" class="btn btn-default modalBtn col-md-4" id="signupButton" ng-click="signup()">SIGN UP</button>
 													<div class="col-md-4"></div>	
+												</div>
+												<div class="col-md-12">
+													<div class="checkCredentials" ng-if="!validName">
+														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The first name should contain only letters</span>
+														<span class="sr-only">Error:</span>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<div class="checkCredentials" ng-if="!validSurname">
+														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The last name should contain only letters</span>
+														<span class="sr-only">Error:</span>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<div class="checkCredentials" ng-if="!validEmail">
+														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The email should be in the correct format</span>
+														<span class="sr-only">Error:</span>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<div class="checkCredentials" ng-if="!validUsername">
+														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The username should contain alphanumeric characters and be longer than 4 characters</span>
+														<span class="sr-only">Error:</span>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<div class="checkCredentials" ng-if="!validPassword">
+														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The password should contain alphanumeric characters and be longer than 6 characters</span>
+														<span class="sr-only">Error:</span>
+													</div>
 												</div>
 											</form>
 										</div>
@@ -139,7 +169,7 @@
 	<!--Footer -->
 	<div class="row footer">
 		<div class="socialMediaIcons text-center">
-			<a href="#"><img src="../img/github.png" class="githubIcon"></a>
+			<a href="https://github.com/mjandrevska/helloWorld" target="_blank"><img src="../img/github.png" class="githubIcon"></a>
 			<a href="#"><img src="../img/twitter.png" class="twitterIcon"></a>
 		</div>
 		<p class="footerText text-center">Licensed under the MIT Licence<br />

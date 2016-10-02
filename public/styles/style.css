@@ -62,7 +62,7 @@ body{
 }
 
 .modal-body-signUp{
-	height: 450px;
+	height: 550px;
 }
 
 .modal-content{
@@ -234,4 +234,8 @@ a:hover, a:visited, a:active, a:focus{
 
 .active{
 	background-color: #F2F2F2;
+}
+
+.checkCredentials{
+	color: red;
 }

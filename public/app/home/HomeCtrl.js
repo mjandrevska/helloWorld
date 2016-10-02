@@ -12,7 +12,6 @@ module.exports = function(module){
 
 		var validateInputs = function(){
 			$scope.checkName = validator.isAlpha($scope.user.name) && validator.isLength($scope.user.name, {min:2, max:20});
-			console.log($scope.checkName);
 			$scope.checkSurname = validator.isAlpha($scope.user.surname) && validator.isLength($scope.user.surname, {min:2, max:30});
 			$scope.checkEmail = validator.isEmail($scope.user.email);
 			$scope.checkUsername = validator.isAlphanumeric($scope.user.username) && validator.isLength($scope.user.username, {min:4, max:20});
@@ -23,18 +22,23 @@ module.exports = function(module){
 			validateInputs();
 
 			if($scope.checkName === false){
+				$scope.validName = false;
 				$scope.validInputs = false;
 			}
 			else if($scope.checkSurname === false){
+				$scope.validSurname = false;
 				$scope.validInputs = false;
 			}
 			else if($scope.checkEmail === false){
+				$scope.validEmail = false;
 				$scope.validInputs = false;
 			}
 			else if($scope.checkUsername === false){
+				$scope.validUsername = false;
 				$scope.validInputs = false;
 			}
 			else if($scope.checkPassword === false){
+				$scope.validPassword = false;
 				$scope.validInputs = false;
 			}
 
@@ -49,9 +53,6 @@ module.exports = function(module){
 				function(error){
 					console.log(error);
 				});
-			}
-			else{
-				alert('Invalid credentials');
 			}
 		};
 	}]);
