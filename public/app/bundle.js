@@ -2263,38 +2263,36 @@ module.exports = exports['default'];
 },{"./util/assertString":60}],64:[function(require,module,exports){
 var helloWorldControllers = angular.module('helloWorldApp.controllers',[]);
 var helloWorldAppServices = angular.module('helloWorldApp.services',[]);
-require('./home/HomeCtrl.js')(helloWorldControllers);
-require('./home/HomeService.js')(helloWorldAppServices);
-require('./chat/ChatCtrl.js')(helloWorldControllers);
-require('./chat/ChatService.js')(helloWorldAppServices);
+require('./controllers/home/HomeCtrl.js')(helloWorldControllers);
+require('./services/HomeService.js')(helloWorldAppServices);
+require('./controllers/chat/ChatCtrl.js')(helloWorldControllers);
+require('./services/ChatService.js')(helloWorldAppServices);
 angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWorldApp.services'])
 .config(function($routeProvider){
 	$routeProvider
 	.when("/", {
-		templateUrl: "app/home/home.html", 
+		templateUrl: "app/partials/home.html", 
 		controller: "HomeCtrl"
 	})
 	.when("/chat", {
-		templateUrl: "app/chat/chat.html", 
+		templateUrl: "app/partials/chat.html", 
 		controller: "ChatCtrl"
 	})
 	.otherwise({redirectTo: '/'});
 });
-},{"./chat/ChatCtrl.js":65,"./chat/ChatService.js":66,"./home/HomeCtrl.js":67,"./home/HomeService.js":68}],65:[function(require,module,exports){
+},{"./controllers/chat/ChatCtrl.js":65,"./controllers/home/HomeCtrl.js":66,"./services/ChatService.js":67,"./services/HomeService.js":68}],65:[function(require,module,exports){
 module.exports = function(module){
-	module.controller('ChatCtrl', ['$scope', '$route', function($scope, $route){
+	module.controller('ChatCtrl', ['$scope', '$route', 'ChatService', function($scope, $route, ChatService){
 		console.log('ChatCtrl');
+		$scope.logout = function(){
+			window.localStorage.clear();
+			console.log('Successful');
+			window.location.href = 'http://localhost:3000/#/';
+		};
 	}]);
 };
 
 },{}],66:[function(require,module,exports){
-module.exports = function(module){
-	module.factory('ChatService', ['$http', '$q', function($http, $q){
-		var service = {};
-		return service;
-	}]);
-};
-},{}],67:[function(require,module,exports){
 var validator  = require('validator');
 module.exports = function(module){
 	module.controller('HomeCtrl', ['$scope', '$route', 'HomeService','$window', function($scope, $route, HomeService, $window){
@@ -2359,6 +2357,14 @@ module.exports = function(module){
 			$scope.checkingPassword = validator.isAlphanumeric($scope.user.password) && validator.isLength($scope.user.password, {min:6, max:20});
 		};
 
+		var loggedIn = window.localStorage.getItem('userData');
+
+	  if(loggedIn){
+	    HomeService.userData = JSON.parse(loggedIn);
+	    $window.location.href = '#/chat';
+	    return;
+	  }
+
 		$scope.login = function(){
 			validateLogin();
 
@@ -2389,7 +2395,14 @@ module.exports = function(module){
 	}]);
 };
 
-},{"validator":1}],68:[function(require,module,exports){
+},{"validator":1}],67:[function(require,module,exports){
+module.exports = function(module){
+	module.factory('ChatService', ['$http', '$q', function($http, $q){
+		var service = {};
+		return service;
+	}]);
+};
+},{}],68:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('HomeService', ['$http', '$q','$window', function($http, $q, $window){
 		var service = {};
@@ -2427,11 +2440,6 @@ module.exports = function(module){
 			return deferred.promise;
 		};
 
-		service.logout = function(user){
-			console.log('This is the logout method');
-			window.localStorage.clear();
-			$window.location.href = 'http://localhost:3000/#/';
-		};
 		return service;
 	}]);
 };

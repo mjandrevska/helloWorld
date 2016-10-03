@@ -35,11 +35,6 @@ module.exports = function(module){
 			return deferred.promise;
 		};
 
-		service.logout = function(user){
-			console.log('This is the logout method');
-			window.localStorage.clear();
-			$window.location.href = 'http://localhost:3000/#/';
-		};
 		return service;
 	}]);
 };

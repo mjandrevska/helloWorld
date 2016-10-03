@@ -62,6 +62,14 @@ module.exports = function(module){
 			$scope.checkingPassword = validator.isAlphanumeric($scope.user.password) && validator.isLength($scope.user.password, {min:6, max:20});
 		};
 
+		var loggedIn = window.localStorage.getItem('userData');
+
+	  if(loggedIn){
+	    HomeService.userData = JSON.parse(loggedIn);
+	    $window.location.href = '#/chat';
+	    return;
+	  }
+
 		$scope.login = function(){
 			validateLogin();
 
