@@ -1,6 +1,6 @@
 var validator  = require('validator');
 module.exports = function(module){
-	module.controller('HomeCtrl', ['$scope', '$route', 'HomeService','$window', function($scope, $route, HomeService, $window){
+	module.controller('HomeCtrl', ['$scope', '$route', 'UserService','$window', function($scope, $route, UserService, $window){
 		console.log('This is the main controller');
 		$scope.user = {name: '', surname: '', username: '', email: '', password: ''};
 		$scope.validName = true;
@@ -43,7 +43,7 @@ module.exports = function(module){
 			}
 
 			if($scope.validInputs){
-				HomeService.createUser($scope.user)
+				UserService.createUser($scope.user)
 				.then(function(res){
 					console.log('Successful signup', res);
 					$('.modal').modal('hide');
@@ -65,7 +65,7 @@ module.exports = function(module){
 		var loggedIn = window.localStorage.getItem('userData');
 
 	  if(loggedIn){
-	    HomeService.userData = JSON.parse(loggedIn);
+	    UserService.userData = JSON.parse(loggedIn);
 	    $window.location.href = '#/chat';
 	    return;
 	  }
@@ -83,7 +83,7 @@ module.exports = function(module){
 			}
 
 			if($scope.validInputs){
-				HomeService.login($scope.user)
+				UserService.login($scope.user)
 				.then(function(res){
 					console.log('Successful login', res);
 					$('.modal').each(function(idx){

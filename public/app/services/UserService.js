@@ -1,5 +1,5 @@
 module.exports = function(module){
-	module.factory('HomeService', ['$http', '$q','$window', function($http, $q, $window){
+	module.factory('UserService', ['$http', '$q','$window', function($http, $q, $window){
 		var service = {};
 		service.userData = {};
 
@@ -34,6 +34,20 @@ module.exports = function(module){
 			});
 			return deferred.promise;
 		};
+
+		service.logout = function(){
+			var deferred = $q.defer();
+			$http.get('http://localhost:3000/users/logout')
+			.then(function(result){
+				service.userData = {};
+				deferred.resolve(service.userData);
+			}, function(error){
+				console.log('Error while logging out');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
 		return service;
 	}]);
 };

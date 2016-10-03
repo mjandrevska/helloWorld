@@ -12,6 +12,12 @@ userRouter.use(bodyParser.json());
 	return res.send('OK');
 });*/
 
+//Login
+userRouter.post('/login', userController.login);
+
+//LOGOUT 
+userRouter.get('/logout', userController.logout);
+
 //GET /Users listing
 userRouter.get('/', userController.read);
 
@@ -30,11 +36,6 @@ userRouter.put('/:id', userController.update);
 //DELETE /Users:id
 userRouter.delete('/:id', userController.deleteId);
 
-//Login
-userRouter.post('/login', userController.login);
-
-//LOGOUT 
-userRouter.get('/logout', userController.logout);
 
 
 module.exports = userRouter;

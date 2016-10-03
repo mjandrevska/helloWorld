@@ -2267,6 +2267,7 @@ require('./controllers/home/HomeCtrl.js')(helloWorldControllers);
 require('./services/HomeService.js')(helloWorldAppServices);
 require('./controllers/chat/ChatCtrl.js')(helloWorldControllers);
 require('./services/ChatService.js')(helloWorldAppServices);
+require('./services/UserService.js')(helloWorldAppServices);
 angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWorldApp.services'])
 .config(function($routeProvider){
 	$routeProvider
@@ -2280,14 +2281,19 @@ angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWo
 	})
 	.otherwise({redirectTo: '/'});
 });
-},{"./controllers/chat/ChatCtrl.js":65,"./controllers/home/HomeCtrl.js":66,"./services/ChatService.js":67,"./services/HomeService.js":68}],65:[function(require,module,exports){
+},{"./controllers/chat/ChatCtrl.js":65,"./controllers/home/HomeCtrl.js":66,"./services/ChatService.js":67,"./services/HomeService.js":68,"./services/UserService.js":69}],65:[function(require,module,exports){
 module.exports = function(module){
-	module.controller('ChatCtrl', ['$scope', '$route', 'ChatService', function($scope, $route, ChatService){
+	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', '$window',function($scope, $route, UserService,$window){
 		console.log('ChatCtrl');
 		$scope.logout = function(){
-			window.localStorage.clear();
-			console.log('Successful');
-			window.location.href = 'http://localhost:3000/#/';
+			UserService.logout()
+			.then(function(res){
+				window.localStorage.clear();
+				console.log('Successful');
+				window.location.href = 'http://localhost:3000/#/';
+			}, function(error){
+				console.log('Error for log out');
+			});
 		};
 	}]);
 };
@@ -2295,7 +2301,7 @@ module.exports = function(module){
 },{}],66:[function(require,module,exports){
 var validator  = require('validator');
 module.exports = function(module){
-	module.controller('HomeCtrl', ['$scope', '$route', 'HomeService','$window', function($scope, $route, HomeService, $window){
+	module.controller('HomeCtrl', ['$scope', '$route', 'UserService','$window', function($scope, $route, UserService, $window){
 		console.log('This is the main controller');
 		$scope.user = {name: '', surname: '', username: '', email: '', password: ''};
 		$scope.validName = true;
@@ -2338,7 +2344,7 @@ module.exports = function(module){
 			}
 
 			if($scope.validInputs){
-				HomeService.createUser($scope.user)
+				UserService.createUser($scope.user)
 				.then(function(res){
 					console.log('Successful signup', res);
 					$('.modal').modal('hide');
@@ -2360,7 +2366,7 @@ module.exports = function(module){
 		var loggedIn = window.localStorage.getItem('userData');
 
 	  if(loggedIn){
-	    HomeService.userData = JSON.parse(loggedIn);
+	    UserService.userData = JSON.parse(loggedIn);
 	    $window.location.href = '#/chat';
 	    return;
 	  }
@@ -2378,7 +2384,7 @@ module.exports = function(module){
 			}
 
 			if($scope.validInputs){
-				HomeService.login($scope.user)
+				UserService.login($scope.user)
 				.then(function(res){
 					console.log('Successful login', res);
 					$('.modal').each(function(idx){
@@ -2399,6 +2405,20 @@ module.exports = function(module){
 module.exports = function(module){
 	module.factory('ChatService', ['$http', '$q', function($http, $q){
 		var service = {};
+		service.userData = {};
+		service.logout = function(user){
+			var deferred = $q.defer();
+			$http.get('http://localhost:3000/users/logout', user)
+			.then(function(result){
+				console.log('Logging out and cleaning the user data');
+				service.userData = {};
+				deferred.resolve(service.userData);
+			}, function(error){
+				console.log('Error while logging out');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
 		return service;
 	}]);
 };
@@ -2435,6 +2455,60 @@ module.exports = function(module){
 				console.log('logged in');
 			}, function(error){
 				console.log('Error while logging');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+		return service;
+	}]);
+};
+
+},{}],69:[function(require,module,exports){
+module.exports = function(module){
+	module.factory('UserService', ['$http', '$q','$window', function($http, $q, $window){
+		var service = {};
+		service.userData = {};
+
+		service.createUser = function(user){
+			var deferred = $q.defer();
+			$http.post('http://localhost:3000/users', user)
+			.then(function(res){
+				service.userData = res.data;
+				console.log('Res Data',res.data);
+				window.localStorage.setItem('userData', JSON.stringify(service.userData));
+				deferred.resolve(service.userData);
+				console.log('The new user is created');
+			}, function(error){
+				console.log('There is an error');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
+		service.login = function(user){
+			var deferred = $q.defer();
+			$http.post('http://localhost:3000/users/login', user)
+			.then(function(res){
+				service.userData = res.data;
+				console.log('Res Data',res.data);
+				localStorage.setItem('userData', JSON.stringify(service.userData));
+				deferred.resolve(service.userData);
+				console.log('logged in');
+			}, function(error){
+				console.log('Error while logging');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
+		service.logout = function(){
+			var deferred = $q.defer();
+			$http.get('http://localhost:3000/users/logout')
+			.then(function(result){
+				service.userData = {};
+				deferred.resolve(service.userData);
+			}, function(error){
+				console.log('Error while logging out');
 				deferred.reject(error);
 			});
 			return deferred.promise;
