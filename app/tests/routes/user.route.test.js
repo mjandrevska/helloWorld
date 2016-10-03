@@ -14,6 +14,8 @@ var Users = require('../../models/user');
 //Controller
 var userController = require('../../controllers/user');
 var user1 = null;
+var user2 = null;
+var user1Data = {name: 'FirstName',surname: 'LastName',email: 'test1@test1.com',username: 'username1',password: 'password'};
 
 beforeEach(function(done){
 	async.parallel([
@@ -24,13 +26,7 @@ beforeEach(function(done){
 		},
 	], function() {
 
-		user1 = new Users({
-			name: 'FirstName',
-			surname: 'LastName',
-			email: 'test1@test1.com',
-			username: 'username1',
-			password: 'password'
-		});
+		user1 = new Users(user1Data);
 
 		user2 = new Users({
 			name: 'FirstName',
@@ -57,6 +53,39 @@ beforeEach(function(done){
 });
 
 describe('Unit tests for all the Restful API operations', function(){
+	describe('#login()', function(){
+		it('should be able to login', function(done){
+			request
+			.post('/users/login')
+			.send({username: user1Data.username, password: user1Data.password})
+			.expect(200)
+			.end(function(err, res){
+				if(err){
+					done(err);
+				}
+				else{
+					done();
+				}
+			});
+		});
+	});
+
+	describe('#logout()', function(){
+		it('should be able to logout a user', function(done){
+			request
+			.get('/users/logout')
+			.expect(200)
+			.end(function(err, res){
+				if(err){
+					done(err);
+				}
+				else{
+					done();
+				}
+			});
+		});
+	});
+
 	describe('#read()', function(){
 		it('should be able to list the users', function(done){
 			request
@@ -90,7 +119,6 @@ describe('Unit tests for all the Restful API operations', function(){
 					done(err);
 				}
 				else{
-					console.log('Deleted all the users');
 					done();
 				}
 			});
@@ -107,13 +135,12 @@ describe('Unit tests for all the Restful API operations', function(){
 					done(err);
 				}
 				else{
-					console.log('List a user with the given id' +user1.id);
-					res.body[0]._id.should.equal(user1.id);
-					res.body[0].name.should.equal(user1.name);
-					res.body[0].surname.should.equal(user1.surname);
-					res.body[0].email.should.equal(user1.email);
-					res.body[0].username.should.equal(user1.username);
-					res.body[0].password.should.equal(user1.password);
+					res.body._id.should.equal(user1.id);
+					res.body.name.should.equal(user1.name);
+					res.body.surname.should.equal(user1.surname);
+					res.body.email.should.equal(user1.email);
+					res.body.username.should.equal(user1.username);
+					res.body.password.should.equal(user1.password);
 					done();
 				}
 			});
@@ -130,7 +157,6 @@ describe('Unit tests for all the Restful API operations', function(){
 					done(err);
 				}
 				else{
-					console.log('Delete a user with the given id' +user1.id);
 					done();
 				}
 			});
@@ -140,62 +166,15 @@ describe('Unit tests for all the Restful API operations', function(){
 	describe('#update()', function(){
 		it('should be able to update a user with specific id', function(done){
 			request
-			.put('/users/'+user1.id)
-			.send({'name' : 'Monika'})
+			.put('/users/' +user1.id)
+			.send({name: 'Monika', surname: user1.surname, email: user1.email, username: user1.username, password:user1.password})
 			.expect(200)
 			.end(function(err, res){
 				if(err){
 					done(err);
 				}
 				else{
-					console.log('Update a user with the given id' +user1.id);
-					res.should.have.status(200);
-					//res.should.be.json;
-					res.body.should.be.a('object');
-					res.body.should.have.property('UPDATED');
-					res.body.UPDATED.should.be.a('object');
-					res.body.UPDATED.should.have.property('name');
-					res.body.UPDATED.should.have.property('_id');
-					res.body.UPDATED.should.have.property('surname');
-					res.body.UPDATED.should.have.property('email');
-					res.body.UPDATED.should.have.property('username');
-					res.body.UPDATED.should.have.property('password');
-					res.body.UPDATED.name.should.equal('Monika');
-					done();
-				}
-			});
-		});
-	});
-
-	describe('#login()', function(){
-		it('should be able to login', function(done){
-			request
-			.login('/login')
-			.expect(200)
-			.end(function(err, res){
-				if(err){
-					done(err);
-				}
-				else{
-					console.log('The unit test for the login function');
-					done();
-				}
-			});
-		});
-	});
-
-	describe('#logout()', function(){
-		it('should be able to logout a user', function(done){
-			request
-			.logout('/logout')
-			.expect(200)
-			.end(function(err, res){
-				if(err){
-					done(err);
-				}
-				else{
-					console.log('The unit test for the logout function');
-					res.body.should.have.status(200);
+					res.body.name.should.equal('Monika');
 					done();
 				}
 			});

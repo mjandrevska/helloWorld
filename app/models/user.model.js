@@ -55,7 +55,7 @@ var usernameValidator = [
 var passwordValidator = [
 	validate({
 		validator: 'isLength',
-		arguments: [6,100],
+		arguments: [6,1000],
 		message: 'The password should be longer than {ARGS[0]} and smaller than {ARGS[1]} characters'
 	}),
 	validate({

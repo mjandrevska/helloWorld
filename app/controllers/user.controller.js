@@ -11,7 +11,6 @@ module.exports = {
 
 	create: function(req, res, next){
 		var user;
-		console.log('POST');
 		console.log(req.body);
 		console.log(req.body);
 		user = new Users({
@@ -24,11 +23,9 @@ module.exports = {
 		});
 		user.save(function(err){
 			if(err) {
-				console.log('Error while creating a new user');
 				res.status(400).send(err);
 			}
 			else{
-				console.log('A new user is created using the Sign Up form');
 				user = user.getClean();
 				return res.send(user);
 			} 
@@ -37,7 +34,6 @@ module.exports = {
 
 	read: function(req, res, next){
 		Users.find(function(err, users){
-			console.log('GET USERS');
 			if(err){
 				return console.log(err);
 			}
@@ -53,7 +49,7 @@ module.exports = {
 				console.log(err);
 			}
 			else{
-				console.log('I am deleting all the users');
+
 				return res.send();
 			}
 		});
@@ -65,7 +61,6 @@ module.exports = {
 				return console.log(err);
 			}
 			else{
-				console.log('I am listing a user with specific id');
 				return res.send(user);
 			}
 		});
@@ -87,7 +82,6 @@ module.exports = {
 					res.status(401).send(err);
 				}
 				else{
-					console.log('Updated User');
 					return res.send(user);
 				}
 			});
@@ -101,7 +95,6 @@ module.exports = {
 					console.log(err);
 				}
 				else{
-					console.log('I am deleting this user');
 					return res.send('');
 				}
 			});
@@ -114,9 +107,8 @@ module.exports = {
 				console.log(err);
 			}
 			else{
-				console.log('Successful');
-				console.log('Hello user', user);
 				if(user === false){
+					console.log('Info',info);
 					res.status(401).send('Credentials incorrect');
 					return;
 				}
@@ -130,8 +122,8 @@ module.exports = {
 	},
 
 	logout:  function(req, res, next){
-		console.log('log out');
 		req.logout();
+		res.status(200);
 		res.status(200).send('User logout successful');
 	}
 };

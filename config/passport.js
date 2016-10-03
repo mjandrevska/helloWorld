@@ -30,14 +30,14 @@ passport.use(new LocalStrategy( function(username, password, done) {
 
 //Serialize User
 passport.serializeUser(function(user, done) {
-  console.log('Serizalize',user.id);
+  //console.log('Serizalize',user.id);
   done(null, user.id);
 });
 
 
 //Deserialize User
 passport.deserializeUser(function(id, done) {
-	console.log("Deserializing");
+	//console.log("Deserializing");
   	Users.findById(id, function(err, user) {
     	done(err, user);
   	});

@@ -93,7 +93,7 @@ beforeEach(function(done){
 	});
 });
 
-describe('Listing all the messages', function(){
+describe('Unit tests for all the RESTful operations', function(){
 	describe('#listMessage()', function(){
 		it('should be able to list all the messages', function(done){
 			request
