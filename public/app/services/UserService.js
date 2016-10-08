@@ -48,6 +48,18 @@ module.exports = function(module){
 			return deferred.promise;
 		};
 
+		service.getUsers = function(){
+			var deferred = $q.defer();
+			$http.get('http://localhost:3000/users')
+			.then(function(result){
+				deferred.resolve(result.data);
+			}, function(error){
+				console.log('Error while getting the users');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
 		return service;
 	}]);
 };

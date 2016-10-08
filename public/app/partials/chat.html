@@ -10,7 +10,7 @@
 				<div class="row messageHeader">
 					<div class="col-md-8 messageTitle">Chat with Kiko</div>
 					<div class="col-md-4 messageIcons">
-						<a href="#"><img src="../img/add-user.png" class="headerIcon"></a>
+						<a ng-href="/#/friendsList"><img src="../img/add-user.png" class="headerIcon"></a>
 						<a href="#"><img src="../img/bell.png" class="headerIcon"></a>
 						<a href="#"><img src="../img/gear.png" class="headerIcon"></a>
 						<a href="" ng-click="logout()"><img src="../img/logout.png" class="headerIcon"></a>
@@ -22,37 +22,13 @@
 			<div class="col-md-4 friendsList">
 				<div class="row">
 					<div class="friendDetails">
-						<ul class="media-list">
-	  						<a href="#"><li class="media active">
-							    <div class="col-md-3 media-left">
-							        <img class="media-object" src="../img/test1.jpg">
-							    </div>
-							    <div class="media-body">
-							    	<div class="media-heading friendName">Kristijan Trajkovski</div>
-							    </div>
-	  						</li></a>
+						<ul class="media-list" ng-repeat="friend in users">
 	  						<a href="#"><li class="media">
 							    <div class="col-md-3 media-left">
 							        <img class="media-object" src="../img/test1.jpg">
 							    </div>
 							    <div class="media-body">
-							    	<div class="media-heading friendName">Irina Arsovska</div>
-							    </div>
-	  						</li></a>
-	  						<a href="#"><li class="media">
-							    <div class="col-md-3 media-left">
-							        <img class="media-object friendImage" src="../img/test1.jpg">
-							    </div>
-							    <div class="media-body">
-							    	<div class="media-heading friendName">Ole Dimitrovska</div>
-							    </div>
-	  						</li></a>
-	  						<a href="#"><li class="media">
-							    <div class="col-md-3 media-left">
-							        <img class="media-object friendImage" src="../img/test1.jpg">
-							    </div>
-							    <div class="media-body">
-							    	<div class="media-heading friendName">Ivana Mrckovic</div>
+							    	<div class="media-heading friendName">{{friend.name}}</div>
 							    </div>
 	  						</li></a>
 						</ul>
@@ -65,10 +41,10 @@
 					<div class="col-md-8">
 						<textarea class="form-control firstMessageText" rows="3">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi "</textarea>	
 					</div>
-					<div class="col-md-2 text-center messageTime">18:20 PM</div>
+					<div class="col-md-2 text-center firstMessageTime">18:20 PM</div>
 				</div>
 				<div class="row secondMessage">
-					<div class="col-md-2 text-center messageTime">18:20 PM</div>
+					<div class="col-md-2 text-center firstMessageTime">18:25 PM</div>
 					<div class="col-md-8">
 						<textarea class="form-control secondMessageText" rows="3">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi "</textarea>	
 					</div>
@@ -78,8 +54,8 @@
 					<div class="col-md-12">
 						<textarea class="form-control messagePlaceholder" rows="4" placeholder="Comment here..."></textarea>
 					</div>
-				</div>	
-				<a href="#"><button type="submit" class="btn btn-default pull-right messageSendBtn">SEND</button></a>	
+				</div>
+				<button class="btn btn-default pull-right messageSendBtn" ng-click="sendMessage()">SEND</button>
 			</div>
 		</div>
 	</div>

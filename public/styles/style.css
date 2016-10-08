@@ -160,7 +160,7 @@ img.friendsListIcon{
 	background-color: #cccccc;
 }
 
-.messageTime{
+.firstMessageTime,.secondMessageTime{
 	color: #999999;
 }
 .messageTitle{
@@ -241,4 +241,22 @@ a:hover, a:visited, a:active, a:focus{
 
 .checkCredentials{
 	color: red;
+}
+
+.friendRequestBox{
+	border: 1px solid #2D3E50;
+	padding: 10px;
+	margin: 10px;
+}
+
+.addFriendBtn{
+	background-color: #1BBC9B;
+	padding: 10px;
+	color: #FFF;
+}
+
+.removeFriendBtn{
+	background-color: #E64C66;
+	padding: 10px;
+	color: #FFF;
 }

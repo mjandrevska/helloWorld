@@ -2268,6 +2268,7 @@ require('./services/HomeService.js')(helloWorldAppServices);
 require('./controllers/chat/ChatCtrl.js')(helloWorldControllers);
 require('./services/ChatService.js')(helloWorldAppServices);
 require('./services/UserService.js')(helloWorldAppServices);
+require('./controllers/friends/FriendsListCtrl.js')(helloWorldControllers);
 angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWorldApp.services'])
 .config(function($routeProvider){
 	$routeProvider
@@ -2275,16 +2276,26 @@ angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWo
 		templateUrl: "app/partials/home.html", 
 		controller: "HomeCtrl"
 	})
-	.when("/chat", {
+	.when("/chat/", {
 		templateUrl: "app/partials/chat.html", 
 		controller: "ChatCtrl"
 	})
+	.when("/chat/:id", {
+		templateUrl: "app/partials/chat.html", 
+		controller: "ChatCtrl"
+	})
+	.when("/friendsList", {
+		templateUrl: "app/partials/friendsList.html", 
+		controller: "FriendsListCtrl"
+	})
 	.otherwise({redirectTo: '/'});
 });
-},{"./controllers/chat/ChatCtrl.js":65,"./controllers/home/HomeCtrl.js":66,"./services/ChatService.js":67,"./services/HomeService.js":68,"./services/UserService.js":69}],65:[function(require,module,exports){
+},{"./controllers/chat/ChatCtrl.js":65,"./controllers/friends/FriendsListCtrl.js":66,"./controllers/home/HomeCtrl.js":67,"./services/ChatService.js":68,"./services/HomeService.js":69,"./services/UserService.js":70}],65:[function(require,module,exports){
 module.exports = function(module){
-	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', '$window',function($scope, $route, UserService,$window){
-		console.log('ChatCtrl');
+	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', 'ChatService',function($scope, $route, UserService, ChatService){
+		$scope.message = '';
+		$scope.users = {};
+
 		$scope.logout = function(){
 			UserService.logout()
 			.then(function(res){
@@ -2295,10 +2306,58 @@ module.exports = function(module){
 				console.log('Error for log out');
 			});
 		};
+
+		$scope.sendMessage = function(){
+			console.log('Sending msg');
+			var data = {
+				message: $scope.message,
+				fromUser: UserService.userData.id,
+				toUser: $scope.user.id
+			};
+			console.log('Data', data);
+			ChatService.createMessage($scope.message)
+			.then(function(result){
+				console.log('Successful sending message');
+			}, function(error){
+				console.log(error);
+				alert('Error');
+			});
+		};
+
+		console.log('Scope.users', $scope.users);
+
+		$scope.getUsers = function(){
+			UserService.getUsers()
+			.then(function(result){
+				$scope.users = result;
+			}, function(error){
+				console.log('Error for getting the users');
+			});
+		};
+
+		$scope.getUsers();
+
 	}]);
 };
 
 },{}],66:[function(require,module,exports){
+module.exports = function(module){
+	module.controller('FriendsListCtrl', ['$scope','UserService', function($scope,UserService){
+		console.log('This is the FriendsListCtrl');
+
+		$scope.getUsers = function(){
+			UserService.getUsers()
+			.then(function(result){
+				$scope.users = result;
+			}, function(error){
+				console.log('Error for getting the users');
+			});
+		};
+
+		$scope.getUsers();
+	}]);
+};
+},{}],67:[function(require,module,exports){
 var validator  = require('validator');
 module.exports = function(module){
 	module.controller('HomeCtrl', ['$scope', '$route', 'UserService','$window', function($scope, $route, UserService, $window){
@@ -2348,7 +2407,7 @@ module.exports = function(module){
 				.then(function(res){
 					console.log('Successful signup', res);
 					$('.modal').modal('hide');
-					$window.location.href = '#/chat';
+					$window.location.href = '#/chat/';
 					console.log(res);
 					console.log(res._id);
 				},
@@ -2367,7 +2426,7 @@ module.exports = function(module){
 
 	  if(loggedIn){
 	    UserService.userData = JSON.parse(loggedIn);
-	    $window.location.href = '#/chat';
+	    $window.location.href = '#/chat/';
 	    return;
 	  }
 
@@ -2391,7 +2450,7 @@ module.exports = function(module){
 						$(this).modal('hide');
 						console.log($(this));
 					});
-					$window.location.href = '#/chat';
+					$window.location.href = '#/chat/';
 				}, function(error){
 					alert('Cannot login');
 					console.log('Error while trying to login');
@@ -2401,11 +2460,13 @@ module.exports = function(module){
 	}]);
 };
 
-},{"validator":1}],67:[function(require,module,exports){
+},{"validator":1}],68:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('ChatService', ['$http', '$q', function($http, $q){
 		var service = {};
 		service.userData = {};
+		//service.messages = {};
+
 		service.logout = function(user){
 			var deferred = $q.defer();
 			$http.get('http://localhost:3000/users/logout', user)
@@ -2419,51 +2480,36 @@ module.exports = function(module){
 			});
 			return deferred.promise;
 		};
+
+		service.createMessage = function(message){
+			console.log('Create Messg');
+			var deferred = $q.defer();
+			$http.post('http://localhost:3000/messages', message)
+			.then(function(result){
+				console.log('Successfully created a message');
+				//service.messages = result.data;
+				deferred.resolve(result.data);
+				console.log('Result data', result.data);
+			}, function(error){
+				console.log('Error while creating a message');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
 		return service;
 	}]);
 };
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('HomeService', ['$http', '$q','$window', function($http, $q, $window){
 		var service = {};
-		service.userData = {};
-
-		service.createUser = function(user){
-			var deferred = $q.defer();
-			$http.post('http://localhost:3000/users', user)
-			.then(function(res){
-				service.userData = res.data;
-				console.log('Res Data',res.data);
-				window.localStorage.setItem('userData', JSON.stringify(service.userData));
-				deferred.resolve(service.userData);
-				console.log('The new user is created');
-			}, function(error){
-				console.log('There is an error');
-				deferred.reject(error);
-			});
-			return deferred.promise;
-		};
-
-		service.login = function(user){
-			var deferred = $q.defer();
-			$http.post('http://localhost:3000/users/login', user)
-			.then(function(res){
-				service.userData = res.data;
-				console.log('Res Data',res.data);
-				localStorage.setItem('userData', JSON.stringify(service.userData));
-				deferred.resolve(service.userData);
-				console.log('logged in');
-			}, function(error){
-				console.log('Error while logging');
-				deferred.reject(error);
-			});
-			return deferred.promise;
-		};
+		
 		return service;
 	}]);
 };
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('UserService', ['$http', '$q','$window', function($http, $q, $window){
 		var service = {};
@@ -2509,6 +2555,18 @@ module.exports = function(module){
 				deferred.resolve(service.userData);
 			}, function(error){
 				console.log('Error while logging out');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
+		service.getUsers = function(){
+			var deferred = $q.defer();
+			$http.get('http://localhost:3000/users')
+			.then(function(result){
+				deferred.resolve(result.data);
+			}, function(error){
+				console.log('Error while getting the users');
 				deferred.reject(error);
 			});
 			return deferred.promise;

@@ -3,14 +3,8 @@ var bodyParser = require('body-parser');
 
 var userRouter = express.Router();
 
-
 var userController = require('../controllers/user');
 userRouter.use(bodyParser.json());
-
-/*userRouter.get('/me', function(req, res, next){
-	console.log(req.user);
-	return res.send('OK');
-});*/
 
 //Login
 userRouter.post('/login', userController.login);
@@ -35,7 +29,5 @@ userRouter.put('/:id', userController.update);
 
 //DELETE /Users:id
 userRouter.delete('/:id', userController.deleteId);
-
-
 
 module.exports = userRouter;

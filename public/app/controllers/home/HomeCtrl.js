@@ -47,7 +47,7 @@ module.exports = function(module){
 				.then(function(res){
 					console.log('Successful signup', res);
 					$('.modal').modal('hide');
-					$window.location.href = '#/chat';
+					$window.location.href = '#/chat/';
 					console.log(res);
 					console.log(res._id);
 				},
@@ -66,7 +66,7 @@ module.exports = function(module){
 
 	  if(loggedIn){
 	    UserService.userData = JSON.parse(loggedIn);
-	    $window.location.href = '#/chat';
+	    $window.location.href = '#/chat/';
 	    return;
 	  }
 
@@ -90,7 +90,7 @@ module.exports = function(module){
 						$(this).modal('hide');
 						console.log($(this));
 					});
-					$window.location.href = '#/chat';
+					$window.location.href = '#/chat/';
 				}, function(error){
 					alert('Cannot login');
 					console.log('Error while trying to login');
