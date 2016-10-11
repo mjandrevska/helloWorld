@@ -1,12 +1,31 @@
 <div>
-	<h1>Want to become friends with you</h1>
-	<h1>Recommended friends</h1>
+	<h1>Want to become friends with you:</h1>
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="friendRequestBox" ng-repeat="friend in users">
+				<div class="friendRequestBox-body">
+					<h5><strong>{{friend.name}} {{friend.surname}}</strong></h5>
+					<a href="#">
+						<button type="button" class="btn btn-default addFriendBtn">Accept friend request
+							<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+						</button>
+					</a>
+					<a href="#" ng-click="removeFriend(friend.id)">
+						<button type="button" class="btn btn-default removeFriendBtn">Reject friend request
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+						</button>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<h1>Become friends with:</h1>
 	<div class="row">
 		<div class="col-sm-4">
 			<div class="friendRequestBox" ng-repeat="friend in users">
 			<div class="friendRequestBox-body">
 			<h5><strong>{{friend.name}} {{friend.surname}}</strong></h5>
-			<a href="#" ng-click="addFriend()">
+			<a href ng-click="addFriend(friend._id)">
 				<button type="button" class="btn btn-default addFriendBtn">Add friend
 					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 				</button>

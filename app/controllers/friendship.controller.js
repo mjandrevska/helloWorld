@@ -1,10 +1,7 @@
 var _ = require('lodash');
 
 //Model
-var Friendships = require('../models/Friendship');
-
-//Route
-var friendshipRouter = require('../routes/friendship');
+var Friendships = require('../models/friendship');
 
 module.exports = {
 	getFriendship: function(req, res, next){
@@ -40,14 +37,17 @@ module.exports = {
 	},
 
 	deleteFriendship: function(req, res, next){
-		return Friendships.remove(req.body, function(err){
+		var friend;
+		console.log('Delete friendship');
+		Friendships.remove({id: req.params._id}, function(err){
 			if(err){
-				console.log(err);
+				console.log('Error while deleting a friendship');
+				return res.status();
 			}
 			else{
-				console.log('Deleting the friendship');
+				console.log('Success while deleting a friendship');
 				return res.send();
 			}
-		});	
+		});
 	}
 };

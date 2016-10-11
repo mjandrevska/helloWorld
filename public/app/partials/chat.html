@@ -22,13 +22,13 @@
 			<div class="col-md-4 friendsList">
 				<div class="row">
 					<div class="friendDetails">
-						<ul class="media-list" ng-repeat="friend in users">
+						<ul class="media-list" ng-repeat="friend in myFriends">
 	  						<a href="#"><li class="media">
 							    <div class="col-md-3 media-left">
 							        <img class="media-object" src="../img/test1.jpg">
 							    </div>
 							    <div class="media-body">
-							    	<div class="media-heading friendName">{{friend.name}}</div>
+							    	<div class="media-heading friendName">{{friend.name}} {{friend.surname}}</div>
 							    </div>
 	  						</li></a>
 						</ul>

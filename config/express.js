@@ -19,13 +19,13 @@ app.use(passport.session());
 //Routes
 var userRouter = require('../app/routes/user');
 var messageRouter = require('../app/routes/message');
-//var friendshipRouter = require('../app/routes/friendship');
+var friendshipRouter = require('../app/routes/friendship');
 
 
 //Using routes
 app.use('/users',userRouter);
 app.use('/messages', messageRouter);
-// app.use('/friends', friendshipRouter);
+app.use('/friends', friendshipRouter);
 
 
 module.exports = app;

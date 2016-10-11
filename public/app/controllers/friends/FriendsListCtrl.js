@@ -1,6 +1,7 @@
 module.exports = function(module){
-	module.controller('FriendsListCtrl', ['$scope','UserService', function($scope,UserService){
-		console.log('This is the FriendsListCtrl');
+	module.controller('FriendsListCtrl', ['$scope','UserService', 'FriendsService', function($scope,UserService, FriendsService){
+		$scope.users = {};
+		$scope.myFriends = {};
 
 		$scope.getUsers = function(){
 			UserService.getUsers()
@@ -12,5 +13,22 @@ module.exports = function(module){
 		};
 
 		$scope.getUsers();
+
+		$scope.addFriend = function(friendId){
+			FriendsService.createFriendship(friendId)
+			.then(function(result){
+				console.log('Successfully added a new friend');
+
+			}, function(error){
+				console.log('Error for adding friend');
+			});
+		};
+
+		$scope.removeFriend = function(friendId){
+			console.log('This is the removeFriend function');
+			FriendsService.deleteFriends(friendId);
+			console.log('Removed the friend');
+		};
+
 	}]);
 };

@@ -15,7 +15,7 @@ friendshipRouter.get('/', friendshipController.getFriendship);
 friendshipRouter.post('/', friendshipController.createFriendship);
 
 //Delete a friendship
-friendshipRouter.delete('/', friendshipController.deleteFriendship);
+friendshipRouter.delete('/:id', friendshipController.deleteFriendship);
 
 
 module.exports = friendshipRouter;

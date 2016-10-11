@@ -2268,8 +2268,9 @@ require('./services/HomeService.js')(helloWorldAppServices);
 require('./controllers/chat/ChatCtrl.js')(helloWorldControllers);
 require('./services/ChatService.js')(helloWorldAppServices);
 require('./services/UserService.js')(helloWorldAppServices);
+require('./services/FriendsService.js')(helloWorldAppServices);
 require('./controllers/friends/FriendsListCtrl.js')(helloWorldControllers);
-angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWorldApp.services'])
+angular.module('helloWorldApp',['ngRoute','helloWorldApp.controllers', 'helloWorldApp.services'])
 .config(function($routeProvider){
 	$routeProvider
 	.when("/", {
@@ -2290,7 +2291,7 @@ angular.module('helloWorldApp',['ngRoute', 'helloWorldApp.controllers', 'helloWo
 	})
 	.otherwise({redirectTo: '/'});
 });
-},{"./controllers/chat/ChatCtrl.js":65,"./controllers/friends/FriendsListCtrl.js":66,"./controllers/home/HomeCtrl.js":67,"./services/ChatService.js":68,"./services/HomeService.js":69,"./services/UserService.js":70}],65:[function(require,module,exports){
+},{"./controllers/chat/ChatCtrl.js":65,"./controllers/friends/FriendsListCtrl.js":66,"./controllers/home/HomeCtrl.js":67,"./services/ChatService.js":68,"./services/FriendsService.js":69,"./services/HomeService.js":70,"./services/UserService.js":71}],65:[function(require,module,exports){
 module.exports = function(module){
 	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', 'ChatService',function($scope, $route, UserService, ChatService){
 		$scope.message = '';
@@ -2342,8 +2343,9 @@ module.exports = function(module){
 
 },{}],66:[function(require,module,exports){
 module.exports = function(module){
-	module.controller('FriendsListCtrl', ['$scope','UserService', function($scope,UserService){
-		console.log('This is the FriendsListCtrl');
+	module.controller('FriendsListCtrl', ['$scope','UserService', 'FriendsService', function($scope,UserService, FriendsService){
+		$scope.users = {};
+		$scope.myFriends = {};
 
 		$scope.getUsers = function(){
 			UserService.getUsers()
@@ -2355,6 +2357,23 @@ module.exports = function(module){
 		};
 
 		$scope.getUsers();
+
+		$scope.addFriend = function(friendId){
+			FriendsService.createFriendship(friendId)
+			.then(function(result){
+				console.log('Successfully added a new friend');
+
+			}, function(error){
+				console.log('Error for adding friend');
+			});
+		};
+
+		$scope.removeFriend = function(friendId){
+			console.log('This is the removeFriend function');
+			FriendsService.deleteFriends(friendId);
+			console.log('Removed the friend');
+		};
+
 	}]);
 };
 },{}],67:[function(require,module,exports){
@@ -2502,6 +2521,45 @@ module.exports = function(module){
 };
 },{}],69:[function(require,module,exports){
 module.exports = function(module){
+	module.factory('FriendsService',['$http', '$q', '$window', function($http, $q, $window){
+		var service = {};
+		
+		service.deleteFriends = function(friendId){
+			var deffered = $q.defer();
+			$http.delete('http://localhost:3000/friends/' +friendId)
+			.then(function(result){
+				console.log(result);
+				console.log('Deleted the friends');
+				deffered.resolve();
+			}, function(error){
+				console.log('There is an error while trying to delete a friend');
+				deffered.reject(error);
+			});	
+			return deffered.promise;
+		};
+
+		service.createFriendship = function(friendId){
+			console.log('createFriendship service method');
+			var deffered = $q.defer();
+			console.log({toUser: friendId});
+			$http.post('http://localhost:3000/friends', {toUser: friendId})
+			.then(function(result){
+				console.log('Result',result);
+				console.log('Result data:',result.data);
+				deffered.resolve(result.data);
+				console.log('Created a new friendship');
+			}, function(error){
+				console.log('There is an error while trying to create a new friendship');
+				deffered.reject(error);
+			});
+			return deffered.promise;
+		};
+
+		return service;
+	}]);
+};
+},{}],70:[function(require,module,exports){
+module.exports = function(module){
 	module.factory('HomeService', ['$http', '$q','$window', function($http, $q, $window){
 		var service = {};
 		
@@ -2509,7 +2567,7 @@ module.exports = function(module){
 	}]);
 };
 
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('UserService', ['$http', '$q','$window', function($http, $q, $window){
 		var service = {};
