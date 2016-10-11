@@ -4,8 +4,31 @@ var _ = require('lodash');
 var Friendships = require('../models/friendship');
 
 module.exports = {
-	getFriendship: function(req, res, next){
-		return Friendships.find(function(err, friends){
+	getFriendships: function(req, res, next){
+		var query = {};
+
+		switch(req.query.type){
+			case 'friend_requests':
+				query = {
+					toUser: req.user._id,
+					approved: false
+				};
+				break;
+			case 'friends':
+				query = {
+					$or: [
+						{fromUser: req.user._id},
+						{toUser: req.user._id}
+					],
+					approved:true
+				};
+				break;
+		}
+
+		Friendships
+		.find(query) 
+		.populate('fromUser toUser', 'name surname')
+		.exec(function(err, friends){
 			if(err){
 				return console.log(err);
 			}
@@ -34,6 +57,24 @@ module.exports = {
 				return res.send(friend);
 			} 
 		});	
+	},
+
+	acceptRequest: function(req, res, next){
+		console.log('PUT method');
+		Friendships.findById(req.params.id, function(err, friend){
+			friend.approved = true;
+			console.log('Becoming friends...');
+			friend.save(function(err){
+				if(err){
+					console.log(err);
+					return res.status(401).send(err);
+				}
+				else{
+					console.log('Friends!!!');
+					return res.send(friend);
+				}
+			});
+		});
 	},
 
 	deleteFriendship: function(req, res, next){

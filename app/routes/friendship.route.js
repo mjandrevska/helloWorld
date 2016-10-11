@@ -9,10 +9,13 @@ var friendshipController = require('../controllers/friendship');
 friendshipRouter.use(bodyParser.json());
 
 //List the friendships
-friendshipRouter.get('/', friendshipController.getFriendship);
+friendshipRouter.get('/', friendshipController.getFriendships);
 
 //Create new friendship
 friendshipRouter.post('/', friendshipController.createFriendship);
+
+//Update a friendship
+friendshipRouter.put('/:id', friendshipController.acceptRequest);
 
 //Delete a friendship
 friendshipRouter.delete('/:id', friendshipController.deleteFriendship);

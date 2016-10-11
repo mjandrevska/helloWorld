@@ -2345,7 +2345,7 @@ module.exports = function(module){
 module.exports = function(module){
 	module.controller('FriendsListCtrl', ['$scope','UserService', 'FriendsService', function($scope,UserService, FriendsService){
 		$scope.users = {};
-		$scope.myFriends = {};
+		$scope.friendRequests = {};
 
 		$scope.getUsers = function(){
 			UserService.getUsers()
@@ -2359,7 +2359,7 @@ module.exports = function(module){
 		$scope.getUsers();
 
 		$scope.addFriend = function(friendId){
-			FriendsService.createFriendship(friendId)
+			FriendsService.createFriendships(friendId)
 			.then(function(result){
 				console.log('Successfully added a new friend');
 
@@ -2368,11 +2368,24 @@ module.exports = function(module){
 			});
 		};
 
+		$scope.getFriendRequests = function(){
+			FriendsService.getFriendRequests()
+			.then(function(result){
+				console.log('Successfully getting the friend requests!!!');
+				$scope.friendRequests = result;
+			}, function(error){
+				console.log('error for getting the friend requests from the service');
+			});
+		};
+		
+		$scope.getFriendRequests();
+
 		$scope.removeFriend = function(friendId){
 			console.log('This is the removeFriend function');
 			FriendsService.deleteFriends(friendId);
 			console.log('Removed the friend');
 		};
+
 
 	}]);
 };
@@ -2538,7 +2551,7 @@ module.exports = function(module){
 			return deffered.promise;
 		};
 
-		service.createFriendship = function(friendId){
+		service.createFriendships = function(friendId){
 			console.log('createFriendship service method');
 			var deffered = $q.defer();
 			console.log({toUser: friendId});
@@ -2554,6 +2567,48 @@ module.exports = function(module){
 			});
 			return deffered.promise;
 		};
+
+		service.getUsers = function(){
+			var deferred = $q.defer();
+			$http.get('http://localhost:3000/users')
+			.then(function(result){
+				deferred.resolve(result.data);
+			}, function(error){
+				console.log('Error while getting the users');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
+		service.getFriendships = function(query){
+			var deferred = $q.defer();
+			console.log('this is the getFriendships method');
+			$http.get('http://localhost:3000/friends', query)
+			.then(function(result){
+				console.log(result.data);
+				deferred.resolve(result.data);
+			}, function(error){
+				console.log('Error while getting the friendships');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
+		service.getFriendRequests = function(query){
+			var deferred = $q.defer();
+			console.log('this is the method for getting the friend requests');
+			$http.get('http://localhost:3000/friends', {query: 'friend_requests'})
+			.then(function(result){
+				console.log('Successfully getting the friend requests');
+				console.log('Result data', result.data);
+				deferred.resolve(result.data);
+			}, function(error){
+				console.log('error while getting the friend requests');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
 
 		return service;
 	}]);

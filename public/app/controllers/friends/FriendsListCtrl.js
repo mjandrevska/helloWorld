@@ -1,7 +1,7 @@
 module.exports = function(module){
 	module.controller('FriendsListCtrl', ['$scope','UserService', 'FriendsService', function($scope,UserService, FriendsService){
 		$scope.users = {};
-		$scope.myFriends = {};
+		$scope.friendRequests = {};
 
 		$scope.getUsers = function(){
 			UserService.getUsers()
@@ -15,7 +15,7 @@ module.exports = function(module){
 		$scope.getUsers();
 
 		$scope.addFriend = function(friendId){
-			FriendsService.createFriendship(friendId)
+			FriendsService.createFriendships(friendId)
 			.then(function(result){
 				console.log('Successfully added a new friend');
 
@@ -24,11 +24,24 @@ module.exports = function(module){
 			});
 		};
 
+		$scope.getFriendRequests = function(){
+			FriendsService.getFriendRequests()
+			.then(function(result){
+				console.log('Successfully getting the friend requests!!!');
+				$scope.friendRequests = result;
+			}, function(error){
+				console.log('error for getting the friend requests from the service');
+			});
+		};
+		
+		$scope.getFriendRequests();
+
 		$scope.removeFriend = function(friendId){
 			console.log('This is the removeFriend function');
 			FriendsService.deleteFriends(friendId);
 			console.log('Removed the friend');
 		};
+
 
 	}]);
 };
