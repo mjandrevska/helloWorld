@@ -1,7 +1,9 @@
 module.exports = function(module){
-	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', 'ChatService', 'FriendsService',function($scope, $route, UserService, ChatService,FriendsService){
-		$scope.message = '';
+	module.controller('ChatCtrl', ['$scope', '$routeParams','$route', 'UserService', 'ChatService', 'FriendsService',function($scope, $routeParams,$route, UserService, ChatService,FriendsService){
+		$scope.msg = '';
 		$scope.myFriends = {};
+		$scope.messages = [];
+		$scope.UserService = UserService;
 
 		$scope.logout = function(){
 			UserService.logout()
@@ -17,14 +19,15 @@ module.exports = function(module){
 		$scope.sendMessage = function(){
 			console.log('Sending msg');
 			var data = {
-				message: $scope.message,
+				message: $scope.msg,
 				fromUser: UserService.userData.id,
-				toUser: $scope.user.id
+				toUser: $routeParams.id
 			};
 			console.log('Data', data);
-			ChatService.createMessage($scope.message)
+			ChatService.createMessage(data)
 			.then(function(result){
 				console.log('Successful sending message');
+				document.getElementById("commentTxtArea").value = '';
 			}, function(error){
 				console.log(error);
 				alert('Error');
@@ -32,12 +35,9 @@ module.exports = function(module){
 		};
 
 		$scope.getMyFriends = function(){
-			console.log('this is the method for getting my friends');
 			FriendsService.getMyFriends()
 			.then(function(result){
 				console.log('Successful getting the list of my friends');
-				console.log('My Friends', $scope.myFriends);
-				console.log('res', result);
 				$scope.myFriends = result;
 			}, function(error){
 				console.log('Error while trying to get my friends');
@@ -45,5 +45,18 @@ module.exports = function(module){
 		};
 
 		$scope.getMyFriends();
+
+		$scope.listMyMessages = function(){
+			ChatService.listMessages($routeParams.id)
+			.then(function(result){
+				console.log('Successful listing the messages');
+				$scope.messages = result;
+				console.log('res messages', $scope.messages);
+			}, function(error){
+				console.log('Error for listing the messages');
+			});
+		};
+
+		$scope.listMyMessages();
 	}]);
 };

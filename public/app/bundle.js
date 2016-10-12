@@ -2293,9 +2293,11 @@ angular.module('helloWorldApp',['ngRoute','helloWorldApp.controllers', 'helloWor
 });
 },{"./controllers/chat/ChatCtrl.js":65,"./controllers/friends/FriendsListCtrl.js":66,"./controllers/home/HomeCtrl.js":67,"./services/ChatService.js":68,"./services/FriendsService.js":69,"./services/HomeService.js":70,"./services/UserService.js":71}],65:[function(require,module,exports){
 module.exports = function(module){
-	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', 'ChatService', 'FriendsService',function($scope, $route, UserService, ChatService,FriendsService){
-		$scope.message = '';
+	module.controller('ChatCtrl', ['$scope', '$routeParams','$route', 'UserService', 'ChatService', 'FriendsService',function($scope, $routeParams,$route, UserService, ChatService,FriendsService){
+		$scope.msg = '';
 		$scope.myFriends = {};
+		$scope.messages = [];
+		$scope.UserService = UserService;
 
 		$scope.logout = function(){
 			UserService.logout()
@@ -2311,14 +2313,15 @@ module.exports = function(module){
 		$scope.sendMessage = function(){
 			console.log('Sending msg');
 			var data = {
-				message: $scope.message,
+				message: $scope.msg,
 				fromUser: UserService.userData.id,
-				toUser: $scope.user.id
+				toUser: $routeParams.id
 			};
 			console.log('Data', data);
-			ChatService.createMessage($scope.message)
+			ChatService.createMessage(data)
 			.then(function(result){
 				console.log('Successful sending message');
+				document.getElementById("commentTxtArea").value = '';
 			}, function(error){
 				console.log(error);
 				alert('Error');
@@ -2326,12 +2329,9 @@ module.exports = function(module){
 		};
 
 		$scope.getMyFriends = function(){
-			console.log('this is the method for getting my friends');
 			FriendsService.getMyFriends()
 			.then(function(result){
 				console.log('Successful getting the list of my friends');
-				console.log('My Friends', $scope.myFriends);
-				console.log('res', result);
 				$scope.myFriends = result;
 			}, function(error){
 				console.log('Error while trying to get my friends');
@@ -2339,14 +2339,31 @@ module.exports = function(module){
 		};
 
 		$scope.getMyFriends();
+
+		$scope.listMyMessages = function(){
+			ChatService.listMessages($routeParams.id)
+			.then(function(result){
+				console.log('Successful listing the messages');
+				$scope.messages = result;
+				console.log('res messages', $scope.messages);
+			}, function(error){
+				console.log('Error for listing the messages');
+			});
+		};
+
+		$scope.listMyMessages();
 	}]);
 };
 
 },{}],66:[function(require,module,exports){
 module.exports = function(module){
-	module.controller('FriendsListCtrl', ['$scope','UserService', 'FriendsService', function($scope,UserService, FriendsService){
+	module.controller('FriendsListCtrl', ['$scope', '$window','UserService', 'FriendsService', function($scope,$window,UserService, FriendsService){
 		$scope.users = {};
 		$scope.friendRequests = {};
+
+		$scope.backToChat = function(){
+			$window.location.href = '#/chat/';
+		};
 
 		$scope.getUsers = function(){
 			UserService.getUsers()
@@ -2363,7 +2380,8 @@ module.exports = function(module){
 			FriendsService.createFriendships(friendId)
 			.then(function(result){
 				console.log('Successfully added a new friend');
-
+				var index = $scope.users.indexOf(friendId);
+				$scope.users.splice(index, 1);
 			}, function(error){
 				console.log('Error for adding friend');
 			});
@@ -2381,9 +2399,16 @@ module.exports = function(module){
 		
 		$scope.getFriendRequests();
 
-		$scope.removeFriend = function(friendId){
+		$scope.rejectFriend = function(friendId){
 			console.log('This is the removeFriend function');
-			FriendsService.deleteFriends(friendId);
+			FriendsService.deleteFriends(friendId)
+			.then(function(result){
+				console.log('Sucess while removing a user from the list');
+				var index = $scope.friendRequests.indexOf(friendId);
+				$scope.friendRequests.splice(index, 1);
+			}, function(error){
+				console.log('Error while removing a user');
+			});
 			console.log('Removed the friend');
 		};
 
@@ -2507,7 +2532,7 @@ module.exports = function(module){
 
 },{"validator":1}],68:[function(require,module,exports){
 module.exports = function(module){
-	module.factory('ChatService', ['$http', '$q', function($http, $q){
+	module.factory('ChatService', ['$http', '$q', 'UserService', function($http, $q, UserService){
 		var service = {};
 		service.userData = {};
 		//service.messages = {};
@@ -2537,6 +2562,21 @@ module.exports = function(module){
 				console.log('Result data', result.data);
 			}, function(error){
 				console.log('Error while creating a message');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
+		service.listMessages = function(otherUser){
+			console.log('list messages');
+			var deferred = $q.defer();
+			$http.get('http://localhost:3000/messages', {params: {otherUser: otherUser}})
+			.then(function(result){
+				console.log('Successfully listing the messages');
+				deferred.resolve(result.data);
+				console.log('Result data messages',result.data);
+			}, function(error){	
+				console.log('Error while listing the messages');
 				deferred.reject(error);
 			});
 			return deferred.promise;

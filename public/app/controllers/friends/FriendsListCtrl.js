@@ -1,7 +1,11 @@
 module.exports = function(module){
-	module.controller('FriendsListCtrl', ['$scope','UserService', 'FriendsService', function($scope,UserService, FriendsService){
+	module.controller('FriendsListCtrl', ['$scope', '$window','UserService', 'FriendsService', function($scope,$window,UserService, FriendsService){
 		$scope.users = {};
 		$scope.friendRequests = {};
+
+		$scope.backToChat = function(){
+			$window.location.href = '#/chat/';
+		};
 
 		$scope.getUsers = function(){
 			UserService.getUsers()
@@ -18,7 +22,8 @@ module.exports = function(module){
 			FriendsService.createFriendships(friendId)
 			.then(function(result){
 				console.log('Successfully added a new friend');
-
+				var index = $scope.users.indexOf(friendId);
+				$scope.users.splice(index, 1);
 			}, function(error){
 				console.log('Error for adding friend');
 			});
@@ -36,9 +41,16 @@ module.exports = function(module){
 		
 		$scope.getFriendRequests();
 
-		$scope.removeFriend = function(friendId){
+		$scope.rejectFriend = function(friendId){
 			console.log('This is the removeFriend function');
-			FriendsService.deleteFriends(friendId);
+			FriendsService.deleteFriends(friendId)
+			.then(function(result){
+				console.log('Sucess while removing a user from the list');
+				var index = $scope.friendRequests.indexOf(friendId);
+				$scope.friendRequests.splice(index, 1);
+			}, function(error){
+				console.log('Error while removing a user');
+			});
 			console.log('Removed the friend');
 		};
 

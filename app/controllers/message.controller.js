@@ -7,7 +7,16 @@ var messageRouter = require('../routes/message');
 
 module.exports = {
 	listMessage: function(req, res, next){
-		return Messages.find(req.body, function(err, messages){
+		var query = {};
+		if(req.query.otherUser){
+			query = {
+				$or:[
+					{fromUser: req.user._id, toUser: req.query.otherUser},
+					{fromUser: req.query.otherUser, toUser: req.user._id}
+				]
+			};	
+		}
+		return Messages.find(query, function(err, messages){
 			if(err){
 				console.log(err);
 			}
@@ -21,7 +30,7 @@ module.exports = {
 		var msg;
 		msg = new Messages({
 			message: req.body.message,
-			fromUser: req.body.fromUser,
+			fromUser: req.user.id,
 			toUser: req.body.toUser
 		});
 		msg.save(function(err){

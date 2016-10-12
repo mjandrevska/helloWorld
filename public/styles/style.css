@@ -152,12 +152,12 @@ img.friendsListIcon{
 }
 
 .firstMessageText{
-	background-color: #1BBC9B;
+	background-color: #1BBC9B !important;
 	color: #FFF;
 }
 
 .secondMessageText{
-	background-color: #cccccc;
+	background-color: #cccccc !important;
 }
 
 .firstMessageTime,.secondMessageTime{
@@ -183,6 +183,7 @@ img.friendsListIcon{
 .messagePanel{
 	background-color: #F2F2F2;
 	height: 100%;
+	overflow: auto;
 }
 
 .friendName{

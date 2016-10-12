@@ -1,5 +1,5 @@
 module.exports = function(module){
-	module.factory('ChatService', ['$http', '$q', function($http, $q){
+	module.factory('ChatService', ['$http', '$q', 'UserService', function($http, $q, UserService){
 		var service = {};
 		service.userData = {};
 		//service.messages = {};
@@ -29,6 +29,21 @@ module.exports = function(module){
 				console.log('Result data', result.data);
 			}, function(error){
 				console.log('Error while creating a message');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
+		service.listMessages = function(otherUser){
+			console.log('list messages');
+			var deferred = $q.defer();
+			$http.get('http://localhost:3000/messages', {params: {otherUser: otherUser}})
+			.then(function(result){
+				console.log('Successfully listing the messages');
+				deferred.resolve(result.data);
+				console.log('Result data messages',result.data);
+			}, function(error){	
+				console.log('Error while listing the messages');
 				deferred.reject(error);
 			});
 			return deferred.promise;

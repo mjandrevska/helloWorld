@@ -7,8 +7,8 @@
 				</div>
 			</div>
 			<div class="col-md-8">
-				<div class="row messageHeader">
-					<div class="col-md-8 messageTitle">Chat with Kiko</div>
+				<div class="row messageHeader" ng-repeat="friend in myFriends">
+					<div class="col-md-8 messageTitle">Chat with {{friend.other.name}}</div>
 					<div class="col-md-4 messageIcons">
 						<a ng-href="/#/friendsList"><img src="../img/add-user.png" class="headerIcon"></a>
 						<a href="#"><img src="../img/bell.png" class="headerIcon"></a>
@@ -23,7 +23,7 @@
 				<div class="row">
 					<div class="friendDetails">
 						<ul class="media-list" ng-repeat="friend in myFriends">
-	  						<a href="#"><li class="media">
+	  						<a href="#/chat/{{friend.other._id}}"><li class="media">
 							    <div class="col-md-3 media-left">
 							        <img class="media-object" src="../img/test1.jpg">
 							    </div>
@@ -36,23 +36,30 @@
 				</div>
 			</div>
 			<div class="col-md-8 messagePanel">
-				<div class="row firstMessage">
-					<img src="../img/test1.jpg" class="col-md-1">
+				<div class="row firstMessage" ng-repeat="msg in messages" ng-init="mine = msg.fromUser === UserService.userData._id">
+					<img src="../img/test1.jpg" class="col-md-1" ng-if="!mine">
+					<div class="col-md-2 text-center firstMessageTime" ng-if="mine">18:25 PM</div>
 					<div class="col-md-8">
-						<textarea class="form-control firstMessageText" rows="3">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi "</textarea>	
+						<div >
+							<textarea readonly class="form-control firstMessageText" ng-if="mine">{{msg.message}}</textarea>
+							<textarea readonly class="form-control secondMessageText" ng-if="!mine">{{msg.message}}</textarea>
+						</div>	
 					</div>
-					<div class="col-md-2 text-center firstMessageTime">18:20 PM</div>
+					<div class="col-md-2 text-center firstMessageTime" ng-if="!mine">18:20 PM</div>
+					<img src="../img/test1.jpg" class="col-md-1" ng-if="mine">
 				</div>
-				<div class="row secondMessage">
+				<!-- <div class="row secondMessage">
 					<div class="col-md-2 text-center firstMessageTime">18:25 PM</div>
 					<div class="col-md-8">
-						<textarea class="form-control secondMessageText" rows="3">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi "</textarea>	
+						<div ng-repeat="msg in messages">
+							<textarea readonly class="form-control secondMessageText" ng-if="msg.fromUser._id !== 'UserService.userData._id'">{{msg.message}}</textarea>
+						</div>	
 					</div>
 					<img src="../img/test1.jpg" class="col-md-1">
-				</div>
+				</div> -->
 				<div class="row">
 					<div class="col-md-12">
-						<textarea class="form-control messagePlaceholder" rows="4" placeholder="Comment here..."></textarea>
+						<textarea id="commentTxtArea" class="form-control messagePlaceholder" rows="4" placeholder="Comment here..." ng-model="msg"></textarea>
 					</div>
 				</div>
 				<button class="btn btn-default pull-right messageSendBtn" ng-click="sendMessage()">SEND</button>

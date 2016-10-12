@@ -70,7 +70,7 @@ module.exports = {
 
 	acceptRequest: function(req, res, next){
 		console.log('PUT method');
-		
+
 		Friendships.findById(req.params.id, function(err, friend){
 			if(err){
 				console.log(err);
@@ -100,7 +100,7 @@ module.exports = {
 	deleteFriendship: function(req, res, next){
 		var friend;
 		console.log('Delete friendship');
-		Friendships.remove({id: req.params._id}, function(err){
+		Friendships.remove({id: req.params.id}, function(err){
 			if(err){
 				console.log('Error while deleting a friendship');
 				return res.status();
