@@ -1,7 +1,7 @@
 module.exports = function(module){
-	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', 'ChatService',function($scope, $route, UserService, ChatService){
+	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', 'ChatService', 'FriendsService',function($scope, $route, UserService, ChatService,FriendsService){
 		$scope.message = '';
-		$scope.users = {};
+		$scope.myFriends = {};
 
 		$scope.logout = function(){
 			UserService.logout()
@@ -31,18 +31,19 @@ module.exports = function(module){
 			});
 		};
 
-		console.log('Scope.users', $scope.users);
-
-		$scope.getUsers = function(){
-			UserService.getUsers()
+		$scope.getMyFriends = function(){
+			console.log('this is the method for getting my friends');
+			FriendsService.getMyFriends()
 			.then(function(result){
-				$scope.users = result;
+				console.log('Successful getting the list of my friends');
+				console.log('My Friends', $scope.myFriends);
+				console.log('res', result);
+				$scope.myFriends = result;
 			}, function(error){
-				console.log('Error for getting the users');
+				console.log('Error while trying to get my friends');
 			});
 		};
 
-		$scope.getUsers();
-
+		$scope.getMyFriends();
 	}]);
 };

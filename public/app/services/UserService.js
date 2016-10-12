@@ -2,7 +2,15 @@ module.exports = function(module){
 	module.factory('UserService', ['$http', '$q','$window', function($http, $q, $window){
 		var service = {};
 		service.userData = {};
+		service.getUserData = function(){
+			var data = $window.localStorage && $window.localStorage.getItem('userData');
+			if(data){
+				service.userData = JSON.parse(data);
+			}
+		};
 
+		service.getUserData();
+		
 		service.createUser = function(user){
 			var deferred = $q.defer();
 			$http.post('http://localhost:3000/users', user)
@@ -34,6 +42,7 @@ module.exports = function(module){
 			});
 			return deferred.promise;
 		};
+
 
 		service.logout = function(){
 			var deferred = $q.defer();

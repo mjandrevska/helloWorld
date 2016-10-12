@@ -33,8 +33,11 @@ in order to install its dependencies
 	npm start
 	```
 	b) in order to start the server
-If you chose 2.a, the tests will finish quickly and you can proceed to step 2.b - starting the server
-If you chose 2.b, Congratulations - you started the server. Please go to browser and you will be able to see the application. which can be accessed on localhost:3000
+
+If you chose 2.a, the tests will finish quickly and you can proceed to step 2.b - starting the server.
+
+If you chose 2.b, Congratulations - you started the server. 
+Please go to browser and you will be able to see the application, which can be accessed on localhost:3000
 
 Also, please be sure to open a new terminal tab and navigate to the /public/app folder. Then, run watchify app.js -o bundle.js. This command start watchify and looks for any changes in the code.
 
@@ -47,10 +50,6 @@ You can run the tests from the root directory with the following command:
 ```
 npm test
 ```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
 
 ## Built With
 

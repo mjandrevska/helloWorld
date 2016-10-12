@@ -4,8 +4,8 @@
 		<div class="col-sm-4">
 			<div class="friendRequestBox" ng-repeat="friend in friendRequests">
 				<div class="friendRequestBox-body">
-					<h5><strong>{{friend.fromUser.name}} {{friend.fromUser.surname}}</strong></h5>
-					<a href="#" ng-click="acceptFriendRequest(friend._id)">
+					<h5><strong>{{friend.other.name}} {{friend.other.surname}}</strong></h5>
+					<a href ng-click="acceptFriendRequest(friend._id)">
 						<button type="button" class="btn btn-default addFriendBtn">Accept friend request
 							<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 						</button>

@@ -40,8 +40,17 @@ module.exports = {
 
 	createFriendship: function(req, res, next){
 		var friend;
-		console.log('POST');
 		console.log(req.body);
+		var query = {};
+		/*query = {
+			$or: [
+				{fromUser: req.user._id},
+				{toUser: req.body.toUser}
+			],
+			approved: true
+		};
+		console.log('Query:',query);
+		friend.find(query);*/
 		friend = new Friendships({
 			fromUser: req.user._id,
 			toUser: req.body.toUser,
@@ -61,10 +70,20 @@ module.exports = {
 
 	acceptRequest: function(req, res, next){
 		console.log('PUT method');
+		
 		Friendships.findById(req.params.id, function(err, friend){
-			friend.approved = true;
-			console.log('Becoming friends...');
-			friend.save(function(err){
+			if(err){
+				console.log(err);
+				return res.status(401).send(err);
+			}
+			else if(!friend){
+				console.log('friendship does not exists');
+				return res.status(401).send();
+			}
+			else{
+				friend.approved = true;
+				console.log('Becoming friends...');
+				friend.save(function(err){
 				if(err){
 					console.log(err);
 					return res.status(401).send(err);
@@ -74,6 +93,7 @@ module.exports = {
 					return res.send(friend);
 				}
 			});
+			}
 		});
 	},
 

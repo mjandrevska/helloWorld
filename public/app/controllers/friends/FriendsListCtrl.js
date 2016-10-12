@@ -42,6 +42,18 @@ module.exports = function(module){
 			console.log('Removed the friend');
 		};
 
+		$scope.acceptFriendRequest = function(friendId){
+			console.log('This is method for accepting the friend requests');
+			FriendsService.acceptRequest(friendId)
+			.then(function(result){
+				console.log('Successfully accepted a friend request');
+				var index = $scope.friendRequests.indexOf(friendId);
+				$scope.friendRequests.splice(index, 1);
+				console.log('yeye');
+			}, function(error){
+				console.log('Error while accepting a friend request');
+			});	
+		};
 
 	}]);
 };

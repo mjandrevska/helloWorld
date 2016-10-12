@@ -2293,9 +2293,9 @@ angular.module('helloWorldApp',['ngRoute','helloWorldApp.controllers', 'helloWor
 });
 },{"./controllers/chat/ChatCtrl.js":65,"./controllers/friends/FriendsListCtrl.js":66,"./controllers/home/HomeCtrl.js":67,"./services/ChatService.js":68,"./services/FriendsService.js":69,"./services/HomeService.js":70,"./services/UserService.js":71}],65:[function(require,module,exports){
 module.exports = function(module){
-	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', 'ChatService',function($scope, $route, UserService, ChatService){
+	module.controller('ChatCtrl', ['$scope', '$route', 'UserService', 'ChatService', 'FriendsService',function($scope, $route, UserService, ChatService,FriendsService){
 		$scope.message = '';
-		$scope.users = {};
+		$scope.myFriends = {};
 
 		$scope.logout = function(){
 			UserService.logout()
@@ -2325,19 +2325,20 @@ module.exports = function(module){
 			});
 		};
 
-		console.log('Scope.users', $scope.users);
-
-		$scope.getUsers = function(){
-			UserService.getUsers()
+		$scope.getMyFriends = function(){
+			console.log('this is the method for getting my friends');
+			FriendsService.getMyFriends()
 			.then(function(result){
-				$scope.users = result;
+				console.log('Successful getting the list of my friends');
+				console.log('My Friends', $scope.myFriends);
+				console.log('res', result);
+				$scope.myFriends = result;
 			}, function(error){
-				console.log('Error for getting the users');
+				console.log('Error while trying to get my friends');
 			});
 		};
 
-		$scope.getUsers();
-
+		$scope.getMyFriends();
 	}]);
 };
 
@@ -2386,6 +2387,18 @@ module.exports = function(module){
 			console.log('Removed the friend');
 		};
 
+		$scope.acceptFriendRequest = function(friendId){
+			console.log('This is method for accepting the friend requests');
+			FriendsService.acceptRequest(friendId)
+			.then(function(result){
+				console.log('Successfully accepted a friend request');
+				var index = $scope.friendRequests.indexOf(friendId);
+				$scope.friendRequests.splice(index, 1);
+				console.log('yeye');
+			}, function(error){
+				console.log('Error while accepting a friend request');
+			});	
+		};
 
 	}]);
 };
@@ -2534,9 +2547,9 @@ module.exports = function(module){
 };
 },{}],69:[function(require,module,exports){
 module.exports = function(module){
-	module.factory('FriendsService',['$http', '$q', '$window', function($http, $q, $window){
+	module.factory('FriendsService',['$http', '$q', '$window','$route','UserService',function($http, $q, $window,$route,UserService){
 		var service = {};
-		
+
 		service.deleteFriends = function(friendId){
 			var deffered = $q.defer();
 			$http.delete('http://localhost:3000/friends/' +friendId)
@@ -2582,7 +2595,6 @@ module.exports = function(module){
 
 		service.getFriendships = function(query){
 			var deferred = $q.defer();
-			console.log('this is the getFriendships method');
 			$http.get('http://localhost:3000/friends', query)
 			.then(function(result){
 				console.log(result.data);
@@ -2596,11 +2608,23 @@ module.exports = function(module){
 
 		service.getFriendRequests = function(query){
 			var deferred = $q.defer();
-			console.log('this is the method for getting the friend requests');
-			$http.get('http://localhost:3000/friends', {query: 'friend_requests'})
+			$http.get('http://localhost:3000/friends', {params: {type: 'friend_requests'}})
 			.then(function(result){
 				console.log('Successfully getting the friend requests');
-				console.log('Result data', result.data);
+				console.log('My userData:', UserService.userData);
+				for(var i=0; i<result.data.length; i++){
+					console.log('Result data fromUser id:',result.data[i].fromUser._id);
+					if(result.data[i].fromUser._id === UserService.userData._id){
+						console.log('This is my id and I am the fromUser');
+						result.data[i].other = result.data[i].toUser;
+						console.log('result data other', result.data[i].toUser);
+					}
+					else{
+						console.log('This is not me and I am the toUser');
+						result.data[i].other = result.data[i].fromUser;
+						console.log('result data other:', result.data[i].fromUser);
+					}
+				}
 				deferred.resolve(result.data);
 			}, function(error){
 				console.log('error while getting the friend requests');
@@ -2609,6 +2633,48 @@ module.exports = function(module){
 			return deferred.promise;
 		};
 
+		service.getMyFriends = function(query){
+			var deferred = $q.defer();
+			console.log('This is the method for getting my friends (accepted)');
+			$http.get('http://localhost:3000/friends', {params: {type: 'friends'}})
+			.then(function(result){
+				console.log('Successfully getting my friends (accepted)');
+				for(var i=0; i<result.data.length; i++){
+					console.log('Result data fromUser id:',result.data[i].fromUser._id);
+					if(result.data[i].fromUser._id === UserService.userData._id){
+						console.log('This is my id and I am the fromUser');
+						result.data[i].other = result.data[i].toUser;
+						console.log('result data other', result.data[i].toUser);
+					}
+					else{
+						console.log('This is not me and I am the toUser');
+						result.data[i].other = result.data[i].fromUser;
+						console.log('result data other:', result.data[i].fromUser);
+					}
+				}
+				deferred.resolve(result.data);
+			}, function(error){
+				console.log('Error while getting my friends');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
+
+		service.acceptRequest = function(friendId){
+			var deferred = $q.defer();
+			console.log('This is the method for accepting friend requests');
+			console.log('friendId:',friendId);
+			$http.put('http://localhost:3000/friends/' +friendId)
+			.then(function(result){
+				console.log('friendId:',friendId);
+				console.log('Sucess while accepting a friend request');
+				deferred.resolve(result.data);
+			}, function(error){
+				console.log('Error while trying to accept a friend request');
+				deferred.reject(error);
+			});
+			return deferred.promise;
+		};
 
 		return service;
 	}]);
@@ -2627,7 +2693,15 @@ module.exports = function(module){
 	module.factory('UserService', ['$http', '$q','$window', function($http, $q, $window){
 		var service = {};
 		service.userData = {};
+		service.getUserData = function(){
+			var data = $window.localStorage && $window.localStorage.getItem('userData');
+			if(data){
+				service.userData = JSON.parse(data);
+			}
+		};
 
+		service.getUserData();
+		
 		service.createUser = function(user){
 			var deferred = $q.defer();
 			$http.post('http://localhost:3000/users', user)
@@ -2659,6 +2733,7 @@ module.exports = function(module){
 			});
 			return deferred.promise;
 		};
+
 
 		service.logout = function(){
 			var deferred = $q.defer();
