@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var primus = require('../../config/primus');
 //Model
 var Messages = require('../models/message');
 
@@ -11,8 +12,8 @@ module.exports = {
 		if(req.query.otherUser){
 			query = {
 				$or:[
-					{fromUser: req.user._id, toUser: req.query.otherUser},
-					{fromUser: req.query.otherUser, toUser: req.user._id}
+					{fromUser: req.user.id, toUser: req.query.otherUser},
+					{fromUser: req.query.otherUser, toUser: req.user.id}
 				]
 			};	
 		}
@@ -38,6 +39,23 @@ module.exports = {
 				console.log(err);
 			}
 			else{
+				console.log('primus users', primus.users);
+				var i;
+				var pmessage = {
+					type: 'message',
+					data: msg.toObject()
+				};
+				if(primus.users[req.body.toUser]) {
+					for(i=0; i<primus.users[req.body.toUser].length; i++){
+						console.log(primus.users[req.body.toUser][i]);
+						primus.users[req.body.toUser][i].write(pmessage);
+					}
+				}
+				if(primus.users[req.user.id]) {
+					for(i=0; i<primus.users[req.user.id].length; i++){
+						primus.users[req.user.id][i].write(pmessage);
+					}
+				}
 				return res.send(msg);
 			}
 		});

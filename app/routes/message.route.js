@@ -2,11 +2,12 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var messageRouter = express.Router();
 
+var userController = require('../controllers/user');
 var messageController = require('../controllers/message');
 messageRouter.use(bodyParser.json());
 
 //GET Messages: List all the messages
-messageRouter.get('/', messageController.listMessage);
+messageRouter.get('/', [userController.checkLoggedIn, messageController.listMessage]);
 
 //POST Messages: Create a new message
 messageRouter.post('/', messageController.createMessage);

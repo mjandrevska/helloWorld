@@ -58,16 +58,17 @@ body{
 }
 
 .modal-body{
-	height: 250px;
+	height: 300px;
 }
 
-.modal-body-signUp{
+.modal-body-signup{
 	height: 550px;
 }
 
 .modal-body-login{
-	height: 270px;
+	height: 300px;
 }
+
 .modal-content{
 	border: 1px solid #E64C66;
 }
@@ -93,6 +94,9 @@ body{
 	margin-bottom: 20px;
 }
 
+.introNumberWizard{
+	padding: 10px;
+}
 .homepageSubmitBtn{
 	background-color: #E64C66;
 	border-radius: 4px;
@@ -184,6 +188,7 @@ img.friendsListIcon{
 	background-color: #F2F2F2;
 	height: 100%;
 	overflow: auto;
+	padding: 15px;
 }
 
 .friendName{
@@ -260,4 +265,11 @@ a:hover, a:visited, a:active, a:focus{
 	background-color: #E64C66;
 	padding: 10px;
 	color: #FFF;
+}
+
+.backChatBtn{
+	background-color: #2D3E50;
+	color: #FFF;
+	padding: 10px;
+	margin: 10px;
 }

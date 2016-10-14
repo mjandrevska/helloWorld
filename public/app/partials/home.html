@@ -5,139 +5,131 @@
 				<div class="col-md-2"></div>
 				<div class="col-md-6"></div>
 				<div class="col-md-2">
-					<a class="btn btn-default homepageBtn" type="button" data-toggle="modal" data-target="#loginModal">Log In</a>
-
-					<!-- Login Modal -->
-					<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-									<h4 class="modal-title text-center" id="loginModalLabel">LOG IN</h4>
-								</div>
-								<div class="modal-body-login">
-									<div class="row">
-										<div class="col-md-2"></div>
-										<div class="col-md-8">
-											<form>
-												<div class="form-group">
-													<label for="username">Your Username</label>
-													<input type="username" class="form-control" id="loginUsername" ng-model="user.username">
-												</div>
-												<div class="form-group">
-													<label for="password">Your Password</label>
-													<input type="password" class="form-control" id="loginPassword" ng-model="user.password">
-												</div>
-												<div>
-													<div class="col-md-4"></div>
-													<button type="submit" class="btn btn-default modalBtn col-md-4" id="loginButton" ng-click="login()">LOG IN</button>
-													<div class="col-md-4"></div>	
-												</div>
-												<div class="col-md-12">
-													<div class="checkCredentials" ng-if="!validUsername">
-														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> Please enter the correct username</span>
-														<span class="sr-only">Error:</span>
-													</div>
-												</div>
-												<div class="col-md-12">
-													<div class="checkCredentials" ng-if="!validPassword">
-														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> Please enter the correct password</span>
-														<span class="sr-only">Error:</span>
-													</div>
-												</div>
-												<div class="col-md-12">
-													<div class="checkCredentials" ng-if="!validInputs">
-														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> Please enter the correct credentials</span>
-														<span class="sr-only">Error:</span>
-													</div>
-												</div>
-											</form>
+					<a class="btn btn-default homepageBtn" type="button" ng-click="openModal()">Log In</a>
+					<div class="modal-demo">
+					<script type="text/ng-template" id="myLoginModalContent.html">
+				        <div class="modal-header">
+				            <h3 class="modal-title text-center" id="modal-title">LOG IN</h3>
+				        </div>
+				        <div class="modal-body-login" id="modal-body">
+				           <div class="row">
+								<div class="col-md-2"></div>
+								<div class="col-md-8">
+									<form>
+										<div class="form-group">
+											<label for="username">Your Username</label>
+											<input type="username" class="form-control" id="loginUsername" ng-model="$ctrl.user.username">
 										</div>
-										<div class="col-md-2"></div>
-									</div>
+										<div class="form-group">
+											<label for="password">Your Password</label>
+											<input type="password" class="form-control" id="loginPassword" ng-model="$ctrl.user.password">
+										</div>
+										<div>
+											<div class="col-md-4"></div>
+											<button type="submit" class="btn btn-default modalBtn col-md-4" id="loginButton" ng-click="$ctrl.login()">LOG IN</button>
+											<div class="col-md-4"></div>	
+										</div>
+										<div class="col-md-12">
+											<div class="checkCredentials" ng-if="!$ctrl.validUsername">
+												<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> Please enter the correct username</span>
+												<span class="sr-only">Error:</span>
+											</div>
+										</div>
+										<div class="col-md-12">
+											<div class="checkCredentials" ng-if="!$ctrl.validPassword">
+												<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> Please enter the correct password</span>
+												<span class="sr-only">Error:</span>
+											</div>
+										</div>
+										<div class="col-md-12">
+											<div class="checkCredentials" ng-if="!$ctrl.validInputs">
+												<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> Please enter the correct credentials</span>
+												<span class="sr-only">Error:</span>
+											</div>
+										</div>
+									</form>
 								</div>
+								<div class="col-md-2"></div>
 							</div>
-						</div>
-					</div>
+				        </div>
+				    </script>
+				    </div>
 				</div>
-				<div class="col-md-2">
-					<a class="btn btn-default homepageBtn" type="button" data-toggle="modal" data-target="#signUpModal">Sign Up</a>
 
-					<!-- SignUpModal Modal -->
-					<div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-									<h4 class="modal-title text-center" id="loginModalLabel">SIGN UP</h4>
-								</div>
-								<div class="modal-body-signUp">
-									<div class="row">
-										<div class="col-md-2"></div>
-										<div class="col-md-8">
-											<form>
-												<div class="form-group">
-													<label for="signUpName">Your Name</label>
-													<input type="name" class="form-control" id="signUpName" ng-model="user.name">
-												</div>
-												<div class="form-group">
-													<label for="signUpSurname">Your Surname</label>
-													<input type="surname" class="form-control" id="signUpSurname" ng-model="user.surname">
-												</div>
-												<div class="form-group">
-													<label for="signUpEmail">Your Email</label>
-													<input type="email" class="form-control" id="signUpEmail" ng-model="user.email">
-												</div>
-												<div class="form-group">
-													<label for="signUpUsername">Your Username</label>
-													<input type="username" class="form-control" id="signUpUsername" ng-model="user.username">
-												</div>
-												<div class="form-group">
-													<label for="signUpPassword">Your Password</label>
-													<input type="password" class="form-control" id="signUpPassword" ng-model="user.password">
-												</div>
-												<div>
-													<div class="col-md-4"></div>
-													<button type="submit" class="btn btn-default modalBtn col-md-4" id="signupButton" ng-click="signup()">SIGN UP</button>
-													<div class="col-md-4"></div>	
-												</div>
-												<div class="col-md-12">
-													<div class="checkCredentials" ng-if="!validName">
-														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The first name should contain only letters</span>
-														<span class="sr-only">Error:</span>
-													</div>
-												</div>
-												<div class="col-md-12">
-													<div class="checkCredentials" ng-if="!validSurname">
-														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The last name should contain only letters</span>
-														<span class="sr-only">Error:</span>
-													</div>
-												</div>
-												<div class="col-md-12">
-													<div class="checkCredentials" ng-if="!validEmail">
-														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The email should be in the correct format</span>
-														<span class="sr-only">Error:</span>
-													</div>
-												</div>
-												<div class="col-md-12">
-													<div class="checkCredentials" ng-if="!validUsername">
-														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The username should contain alphanumeric characters and be longer than 4 characters</span>
-														<span class="sr-only">Error:</span>
-													</div>
-												</div>
-												<div class="col-md-12">
-													<div class="checkCredentials" ng-if="!validPassword">
-														<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The password should contain alphanumeric characters and be longer than 6 characters</span>
-														<span class="sr-only">Error:</span>
-													</div>
-												</div>
-											</form>
+				<div class="col-md-2">
+					<a class="btn btn-default homepageBtn" type="button" ng-click="openSignUpModal()">Sign Up</a>
+
+					<div class="signUp-modal-dialog">
+						<script type="text/ng-template" id="mySignUpModalContent.html">
+				        <div class="modal-header">
+				            <h3 class="modal-title text-center" id="modal-title">SIGN UP</h3>
+				        </div>
+				        <div class="modal-body-signup" id="modal-body">
+				           <div class="row">
+								<div class="col-md-2"></div>
+								<div class="col-md-8">
+									<form>
+										<div class="form-group">
+											<label for="signUpName">Your Name</label>
+											<input type="name" class="form-control" id="signUpName" ng-model="$signupCtrl.user.name">
 										</div>
-										<div class="col-md-2"></div>
-									</div>
+										<div class="form-group">
+											<label for="signUpSurname">Your Surname</label>
+											<input type="surname" class="form-control" id="signUpSurname" ng-model="$signupCtrl.user.surname">
+										</div>
+										<div class="form-group">
+											<label for="signUpEmail">Your Email</label>
+											<input type="email" class="form-control" id="signUpEmail" ng-model="$signupCtrl.user.email">
+										</div>
+										<div class="form-group">
+											<label for="signUpUsername">Your Username</label>
+											<input type="username" class="form-control" id="signUpUsername" ng-model="$signupCtrl.user.username">
+										</div>
+										<div class="form-group">
+											<label for="signUpPassword">Your Password</label>
+											<input type="password" class="form-control" id="signUpPassword" ng-model="$signupCtrl.user.password">
+										</div>
+										<div>
+											<div class="col-md-4"></div>
+											<button type="submit" class="btn btn-default modalBtn col-md-4" id="signupButton" ng-click="$signupCtrl.signup()">SIGN UP</button>
+											<div class="col-md-4"></div>	
+										</div>
+										<div class="col-md-12">
+											<div class="checkCredentials" ng-if="!$signupCtrl.validName">
+												<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The first name should contain only letters</span>
+												<span class="sr-only">Error:</span>
+											</div>
+										</div>
+										<div class="col-md-12">
+											<div class="checkCredentials" ng-if="!$signupCtrl.validSurname">
+												<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The last name should contain only letters</span>
+												<span class="sr-only">Error:</span>
+											</div>
+										</div>
+										<div class="col-md-12">
+											<div class="checkCredentials" ng-if="!$signupCtrl.validEmail">
+												<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The email should be in the correct format</span>
+												<span class="sr-only">Error:</span>
+											</div>
+										</div>
+										<div class="col-md-12">
+											<div class="checkCredentials" ng-if="!$signupCtrl.validUsername">
+												<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The username should contain alphanumeric characters and be longer than 4 characters</span>
+												<span class="sr-only">Error:</span>
+											</div>
+										</div>
+										<div class="col-md-12">
+											<div class="checkCredentials" ng-if="!$signupCtrl.validPassword">
+												<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"> The password should contain alphanumeric characters and be longer than 6 characters</span>
+												<span class="sr-only">Error:</span>
+											</div>
+										</div>
+									</form>
 								</div>
+								<div class="col-md-2"></div>
 							</div>
-						</div>
+				        </div>
+				    </script>
 					</div>
 				</div>
 			</div>
@@ -153,8 +145,12 @@
 	<div class="row homepageWizard">
 		<div class="homepageTitle text-center">How to use it</div>
 		<div class="numberWizard text-center">
-			<img src="../img/1.png">
-			<div>Get notified</div>
+			<img src="../img/1.png" class="test animated fadeInDown">
+			<div class="introNumberWizard animated fadeInDown">Receive friend request</div>
+			<img src="../img/2.png" class="animated fadeInDown">
+			<div class="introNumberWizard animated fadeInDown">Become friends</div>
+			<img src="../img/3.png" class="animated fadeInDown">
+			<div class="introNumberWizard animated fadeInDown">Chat!</div>
 		</div>
 	</div>
 
@@ -164,20 +160,20 @@
 		<div class="row homepageForm">	
 			<div class="col-md-4"></div>
 			<div class="col-md-4">
-				<form>
+				<form method="post">
 					<div class="form-group">
 						<label for="name">Your Name</label>
-						<input type="name" class="form-control" id="name">
+						<input type="name" class="form-control">
 					</div>
 					<div class="form-group">
 						<label for="email">Your Email</label>
-						<input type="email" class="form-control" id="email">
+						<input type="email" class="form-control">
 					</div>
 					<div class="form-group">
 						<label for="message">Message</label>
 						<textarea class="form-control" rows="3"></textarea>
 					</div>
-					<a href="#"><button type="submit" class="btn btn-default homepageSubmitBtn">Submit</button></a>
+					<a href="mailto:monikajandrevska@gmail.com"><button type="submit" class="btn btn-default homepageSubmitBtn">Submit</button></a>
 				</form>
 			</div>
 			<div class="col-md-4"></div>

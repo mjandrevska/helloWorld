@@ -4,7 +4,7 @@ module.exports = function(module){
 
 		service.deleteFriends = function(friendId){
 			var deffered = $q.defer();
-			$http.delete('http://localhost:3000/friends/' +friendId)
+			$http.delete('/friends/' +friendId)
 			.then(function(result){
 				console.log(result);
 				console.log('Deleted the friends');
@@ -20,7 +20,7 @@ module.exports = function(module){
 			console.log('createFriendship service method');
 			var deffered = $q.defer();
 			console.log({toUser: friendId});
-			$http.post('http://localhost:3000/friends', {toUser: friendId})
+			$http.post('/friends', {toUser: friendId})
 			.then(function(result){
 				console.log('Result',result);
 				console.log('Result data:',result.data);
@@ -35,7 +35,7 @@ module.exports = function(module){
 
 		service.getUsers = function(){
 			var deferred = $q.defer();
-			$http.get('http://localhost:3000/users')
+			$http.get('/users')
 			.then(function(result){
 				deferred.resolve(result.data);
 			}, function(error){
@@ -47,7 +47,7 @@ module.exports = function(module){
 
 		service.getFriendships = function(query){
 			var deferred = $q.defer();
-			$http.get('http://localhost:3000/friends', query)
+			$http.get('/friends', query)
 			.then(function(result){
 				console.log(result.data);
 				deferred.resolve(result.data);
@@ -60,10 +60,8 @@ module.exports = function(module){
 
 		service.getFriendRequests = function(query){
 			var deferred = $q.defer();
-			$http.get('http://localhost:3000/friends', {params: {type: 'friend_requests'}})
+			$http.get('/friends', {params: {type: 'friend_requests'}})
 			.then(function(result){
-				console.log('Successfully getting the friend requests');
-				console.log('My userData:', UserService.userData);
 				for(var i=0; i<result.data.length; i++){
 					console.log('Result data fromUser id:',result.data[i].fromUser._id);
 					if(result.data[i].fromUser._id === UserService.userData._id){
@@ -87,21 +85,15 @@ module.exports = function(module){
 
 		service.getMyFriends = function(query){
 			var deferred = $q.defer();
-			console.log('This is the method for getting my friends (accepted)');
-			$http.get('http://localhost:3000/friends', {params: {type: 'friends'}})
+			$http.get('/friends', {params: {type: 'friends'}})
 			.then(function(result){
-				console.log('Successfully getting my friends (accepted)');
 				for(var i=0; i<result.data.length; i++){
 					console.log('Result data fromUser id:',result.data[i].fromUser._id);
 					if(result.data[i].fromUser._id === UserService.userData._id){
-						console.log('This is my id and I am the fromUser');
 						result.data[i].other = result.data[i].toUser;
-						console.log('result data other', result.data[i].toUser);
 					}
 					else{
-						console.log('This is not me and I am the toUser');
 						result.data[i].other = result.data[i].fromUser;
-						console.log('result data other:', result.data[i].fromUser);
 					}
 				}
 				deferred.resolve(result.data);
@@ -114,9 +106,7 @@ module.exports = function(module){
 
 		service.acceptRequest = function(friendId){
 			var deferred = $q.defer();
-			console.log('This is the method for accepting friend requests');
-			console.log('friendId:',friendId);
-			$http.put('http://localhost:3000/friends/' +friendId)
+			$http.put('/friends/' +friendId)
 			.then(function(result){
 				console.log('friendId:',friendId);
 				console.log('Sucess while accepting a friend request');

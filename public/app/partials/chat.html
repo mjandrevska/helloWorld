@@ -7,12 +7,11 @@
 				</div>
 			</div>
 			<div class="col-md-8">
-				<div class="row messageHeader" ng-repeat="friend in myFriends">
-					<div class="col-md-8 messageTitle">Chat with {{friend.other.name}}</div>
-					<div class="col-md-4 messageIcons">
+				<div class="row messageHeader">
+					<div class="col-md-9 messageTitle">Chat with friend</div>
+					<div class="col-md-3 messageIcons">
 						<a ng-href="/#/friendsList"><img src="../img/add-user.png" class="headerIcon"></a>
-						<a href="#"><img src="../img/bell.png" class="headerIcon"></a>
-						<a href="#"><img src="../img/gear.png" class="headerIcon"></a>
+
 						<a href="" ng-click="logout()"><img src="../img/logout.png" class="headerIcon"></a>
 					</div>
 				</div>
@@ -38,25 +37,16 @@
 			<div class="col-md-8 messagePanel">
 				<div class="row firstMessage" ng-repeat="msg in messages" ng-init="mine = msg.fromUser === UserService.userData._id">
 					<img src="../img/test1.jpg" class="col-md-1" ng-if="!mine">
-					<div class="col-md-2 text-center firstMessageTime" ng-if="mine">18:25 PM</div>
+					<div class="col-md-2 text-center firstMessageTime" ng-if="mine">{{getMessageTime(msg.createdAt).format('LT')}}</div>
 					<div class="col-md-8">
 						<div >
 							<textarea readonly class="form-control firstMessageText" ng-if="mine">{{msg.message}}</textarea>
 							<textarea readonly class="form-control secondMessageText" ng-if="!mine">{{msg.message}}</textarea>
 						</div>	
 					</div>
-					<div class="col-md-2 text-center firstMessageTime" ng-if="!mine">18:20 PM</div>
+					<div class="col-md-2 text-center firstMessageTime" ng-if="!mine">{{getMessageTime(msg.createdAt).format('LT')}}</div>
 					<img src="../img/test1.jpg" class="col-md-1" ng-if="mine">
 				</div>
-				<!-- <div class="row secondMessage">
-					<div class="col-md-2 text-center firstMessageTime">18:25 PM</div>
-					<div class="col-md-8">
-						<div ng-repeat="msg in messages">
-							<textarea readonly class="form-control secondMessageText" ng-if="msg.fromUser._id !== 'UserService.userData._id'">{{msg.message}}</textarea>
-						</div>	
-					</div>
-					<img src="../img/test1.jpg" class="col-md-1">
-				</div> -->
 				<div class="row">
 					<div class="col-md-12">
 						<textarea id="commentTxtArea" class="form-control messagePlaceholder" rows="4" placeholder="Comment here..." ng-model="msg"></textarea>

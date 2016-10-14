@@ -9,6 +9,15 @@ var userRouter = require('../routes/user');
 
 module.exports = {
 
+	checkLoggedIn: function(req, res, next) {
+		if(req.user) {
+			next();
+		}
+		else {
+			res.status(403).send('Not logged in!');
+		}
+	},
+
 	create: function(req, res, next){
 		var user;
 		console.log(req.body);

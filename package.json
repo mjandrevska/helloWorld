@@ -4,6 +4,7 @@
   "description": "Conversation app",
   "main": "server.js",
   "dependencies": {
+    "animate.css": "^3.5.2",
     "assert": "^1.4.1",
     "async": "^2.0.1",
     "body-parser": "^1.15.2",
@@ -12,6 +13,7 @@
     "express-session": "^1.14.1",
     "lodash": "^4.15.0",
     "mocha": "^3.0.2",
+    "moment": "^2.15.1",
     "mongodb": "^2.2.7",
     "mongoose": "^4.5.9",
     "mongoose-validator": "^1.2.5",

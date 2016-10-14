@@ -1,14 +1,14 @@
 # HelloWorld Web application
 
-HelloWorld is an individual open-source project. It is web application - simple chat system in which friends can communicate between themselves. Also, adding new friends as well as accepting/rejecting friend requests is possible and exists as a feature.
+HelloWorld is an individual open-source project. It is web application - simple chat system in which friends can communicate between each other. Also, adding new friends as well as accepting/rejecting friend requests is possible and exists as a feature.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Please read the instructions below.
 
 ### Prerequisities
 
-What things you need to install the software and how to install them
+You will need to run mongod
 
 ```
 Give examples
@@ -21,6 +21,11 @@ Give examples
 ```
 npm install
 ```
+
+```
+bower install
+```
+
 in order to install its dependencies
 
 2. After completing step 1, navigate to the root directory of the project and run:

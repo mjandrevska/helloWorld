@@ -1,16 +1,17 @@
 var express = require('express');
-var session = require('express-session'); 
+var cookieSession = require('cookie-session');
 var mongoose = require('mongoose');
 var passport = require('passport');
+var http = require('./http');
+var store = require('./sessionStore');
 
 var app = express();
+http.on('request', app);
 app.use(express.static('public'));
 
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false, maxAge: new Date(253402300000000) }
+app.use(cookieSession({
+  	name: 'session',
+	secret: 'keyboard cat',
 }));
 
 app.use(passport.initialize());
