@@ -63,5 +63,6 @@ module.exports = function(module){
 			$scope.listMyMessages();
 		}
 
+		
 	}]);
 };

@@ -1,4 +1,6 @@
 var validator  = require('validator');
+var ScrollReveal = require('scrollreveal');
+
 module.exports = function(module){
 	module.controller('HomeCtrl', ['$scope', '$route', 'UserService','$window', '$uibModal', function($scope, $route, UserService, $window,$uibModal){
 		console.log('This is the main controller');
@@ -33,6 +35,10 @@ module.exports = function(module){
 			});	
 		};
 
+		var sr = ScrollReveal();
+        $scope.$on("$viewContentLoaded", function () {
+			sr.reveal('.number');
+        });
 		
 	}]);
 
@@ -53,6 +59,7 @@ module.exports = function(module){
 		$ctrl.login = function(){
 			validateLogin();
 
+			$ctrl.validInputs = true;
 			if($ctrl.checkingUsername === false){
 				$ctrl.validUsername = false;
 				$ctrl.validInputs = false;

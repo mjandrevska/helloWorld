@@ -11776,6 +11776,868 @@ module.exports = 'ui.bootstrap';
 
 }));
 },{}],4:[function(require,module,exports){
+/////    /////    /////    /////
+/////    /////    /////    /////
+/////    /////    /////    /////
+/////    /////    /////    /////
+/////             /////    /////
+/////             /////    /////
+/////    /////    /////    /////
+/////    /////    /////    /////
+         /////    /////
+         /////    /////
+/////    /////    /////    /////
+/////    /////    /////    /////
+/////    /////    /////    /////
+/////    /////    /////    /////
+
+/**
+ * ScrollReveal
+ * ------------
+ * Version : 3.3.2
+ * Website : scrollrevealjs.org
+ * Repo    : github.com/jlmakes/scrollreveal.js
+ * Author  : Julian Lloyd (@jlmakes)
+ */
+
+;(function () {
+  'use strict'
+
+  var sr
+  var _requestAnimationFrame
+
+  function ScrollReveal (config) {
+    // Support instantiation without the `new` keyword.
+    if (typeof this === 'undefined' || Object.getPrototypeOf(this) !== ScrollReveal.prototype) {
+      return new ScrollReveal(config)
+    }
+
+    sr = this // Save reference to instance.
+    sr.version = '3.3.2'
+    sr.tools = new Tools() // *required utilities
+
+    if (sr.isSupported()) {
+      sr.tools.extend(sr.defaults, config || {})
+
+      sr.defaults.container = _resolveContainer(sr.defaults)
+
+      sr.store = {
+        elements: {},
+        containers: []
+      }
+
+      sr.sequences = {}
+      sr.history = []
+      sr.uid = 0
+      sr.initialized = false
+    } else if (typeof console !== 'undefined' && console !== null) {
+      // Note: IE9 only supports console if devtools are open.
+      console.log('ScrollReveal is not supported in this browser.')
+    }
+
+    return sr
+  }
+
+  /**
+   * Configuration
+   * -------------
+   * This object signature can be passed directly to the ScrollReveal constructor,
+   * or as the second argument of the `reveal()` method.
+   */
+
+  ScrollReveal.prototype.defaults = {
+    // 'bottom', 'left', 'top', 'right'
+    origin: 'bottom',
+
+    // Can be any valid CSS distance, e.g. '5rem', '10%', '20vw', etc.
+    distance: '20px',
+
+    // Time in milliseconds.
+    duration: 500,
+    delay: 0,
+
+    // Starting angles in degrees, will transition from these values to 0 in all axes.
+    rotate: { x: 0, y: 0, z: 0 },
+
+    // Starting opacity value, before transitioning to the computed opacity.
+    opacity: 0,
+
+    // Starting scale value, will transition from this value to 1
+    scale: 0.9,
+
+    // Accepts any valid CSS easing, e.g. 'ease', 'ease-in-out', 'linear', etc.
+    easing: 'cubic-bezier(0.6, 0.2, 0.1, 1)',
+
+    // `<html>` is the default reveal container. You can pass either:
+    // DOM Node, e.g. document.querySelector('.fooContainer')
+    // Selector, e.g. '.fooContainer'
+    container: window.document.documentElement,
+
+    // true/false to control reveal animations on mobile.
+    mobile: true,
+
+    // true:  reveals occur every time elements become visible
+    // false: reveals occur once as elements become visible
+    reset: false,
+
+    // 'always' — delay for all reveal animations
+    // 'once'   — delay only the first time reveals occur
+    // 'onload' - delay only for animations triggered by first load
+    useDelay: 'always',
+
+    // Change when an element is considered in the viewport. The default value
+    // of 0.20 means 20% of an element must be visible for its reveal to occur.
+    viewFactor: 0.2,
+
+    // Pixel values that alter the container boundaries.
+    // e.g. Set `{ top: 48 }`, if you have a 48px tall fixed toolbar.
+    // --
+    // Visual Aid: https://scrollrevealjs.org/assets/viewoffset.png
+    viewOffset: { top: 0, right: 0, bottom: 0, left: 0 },
+
+    // Callbacks that fire for each triggered element reveal, and reset.
+    beforeReveal: function (domEl) {},
+    beforeReset: function (domEl) {},
+
+    // Callbacks that fire for each completed element reveal, and reset.
+    afterReveal: function (domEl) {},
+    afterReset: function (domEl) {}
+  }
+
+  /**
+   * Check if client supports CSS Transform and CSS Transition.
+   * @return {boolean}
+   */
+  ScrollReveal.prototype.isSupported = function () {
+    var style = document.documentElement.style
+    return 'WebkitTransition' in style && 'WebkitTransform' in style ||
+      'transition' in style && 'transform' in style
+  }
+
+  /**
+   * Creates a reveal set, a group of elements that will animate when they
+   * become visible. If [interval] is provided, a new sequence is created
+   * that will ensure elements reveal in the order they appear in the DOM.
+   *
+   * @param {Node|NodeList|string} [target]   The node, node list or selector to use for animation.
+   * @param {Object}               [config]   Override the defaults for this reveal set.
+   * @param {number}               [interval] Time between sequenced element animations (milliseconds).
+   * @param {boolean}              [sync]     Used internally when updating reveals for async content.
+   *
+   * @return {Object} The current ScrollReveal instance.
+   */
+  ScrollReveal.prototype.reveal = function (target, config, interval, sync) {
+    var container
+    var elements
+    var elem
+    var elemId
+    var sequence
+    var sequenceId
+
+    // No custom configuration was passed, but a sequence interval instead.
+    // let’s shuffle things around to make sure everything works.
+    if (config !== undefined && typeof config === 'number') {
+      interval = config
+      config = {}
+    } else if (config === undefined || config === null) {
+      config = {}
+    }
+
+    container = _resolveContainer(config)
+    elements = _getRevealElements(target, container)
+
+    if (!elements.length) {
+      console.log('ScrollReveal: reveal on "' + target + '" failed, no elements found.')
+      return sr
+    }
+
+    // Prepare a new sequence if an interval is passed.
+    if (interval && typeof interval === 'number') {
+      sequenceId = _nextUid()
+
+      sequence = sr.sequences[sequenceId] = {
+        id: sequenceId,
+        interval: interval,
+        elemIds: [],
+        active: false
+      }
+    }
+
+    // Begin main loop to configure ScrollReveal elements.
+    for (var i = 0; i < elements.length; i++) {
+      // Check if the element has already been configured and grab it from the store.
+      elemId = elements[i].getAttribute('data-sr-id')
+      if (elemId) {
+        elem = sr.store.elements[elemId]
+      } else {
+        // Otherwise, let’s do some basic setup.
+        elem = {
+          id: _nextUid(),
+          domEl: elements[i],
+          seen: false,
+          revealing: false
+        }
+        elem.domEl.setAttribute('data-sr-id', elem.id)
+      }
+
+      // Sequence only setup
+      if (sequence) {
+        elem.sequence = {
+          id: sequence.id,
+          index: sequence.elemIds.length
+        }
+
+        sequence.elemIds.push(elem.id)
+      }
+
+      // New or existing element, it’s time to update its configuration, styles,
+      // and send the updates to our store.
+      _configure(elem, config, container)
+      _style(elem)
+      _updateStore(elem)
+
+      // We need to make sure elements are set to visibility: visible, even when
+      // on mobile and `config.mobile === false`, or if unsupported.
+      if (sr.tools.isMobile() && !elem.config.mobile || !sr.isSupported()) {
+        elem.domEl.setAttribute('style', elem.styles.inline)
+        elem.disabled = true
+      } else if (!elem.revealing) {
+        // Otherwise, proceed normally.
+        elem.domEl.setAttribute('style',
+          elem.styles.inline +
+          elem.styles.transform.initial
+        )
+      }
+    }
+
+    // Each `reveal()` is recorded so that when calling `sync()` while working
+    // with asynchronously loaded content, it can re-trace your steps but with
+    // all your new elements now in the DOM.
+
+    // Since `reveal()` is called internally by `sync()`, we don’t want to
+    // record or intiialize each reveal during syncing.
+    if (!sync && sr.isSupported()) {
+      _record(target, config, interval)
+
+      // We push initialization to the event queue using setTimeout, so that we can
+      // give ScrollReveal room to process all reveal calls before putting things into motion.
+      // --
+      // Philip Roberts - What the heck is the event loop anyway? (JSConf EU 2014)
+      // https://www.youtube.com/watch?v=8aGhZQkoFbQ
+      if (sr.initTimeout) {
+        window.clearTimeout(sr.initTimeout)
+      }
+      sr.initTimeout = window.setTimeout(_init, 0)
+    }
+
+    return sr
+  }
+
+  /**
+   * Re-runs `reveal()` for each record stored in history, effectively capturing
+   * any content loaded asynchronously that matches existing reveal set targets.
+   * @return {Object} The current ScrollReveal instance.
+   */
+  ScrollReveal.prototype.sync = function () {
+    if (sr.history.length && sr.isSupported()) {
+      for (var i = 0; i < sr.history.length; i++) {
+        var record = sr.history[i]
+        sr.reveal(record.target, record.config, record.interval, true)
+      }
+      _init()
+    } else {
+      console.log('ScrollReveal: sync failed, no reveals found.')
+    }
+    return sr
+  }
+
+  /**
+   * Private Methods
+   * ---------------
+   */
+
+  function _resolveContainer (config) {
+    if (config && config.container) {
+      if (typeof config.container === 'string') {
+        return window.document.documentElement.querySelector(config.container)
+      } else if (sr.tools.isNode(config.container)) {
+        return config.container
+      } else {
+        console.log('ScrollReveal: invalid container "' + config.container + '" provided.')
+        console.log('ScrollReveal: falling back to default container.')
+      }
+    }
+    return sr.defaults.container
+  }
+
+  /**
+   * check to see if a node or node list was passed in as the target,
+   * otherwise query the container using target as a selector.
+   *
+   * @param {Node|NodeList|string} [target]    client input for reveal target.
+   * @param {Node}                 [container] parent element for selector queries.
+   *
+   * @return {array} elements to be revealed.
+   */
+  function _getRevealElements (target, container) {
+    if (typeof target === 'string') {
+      return Array.prototype.slice.call(container.querySelectorAll(target))
+    } else if (sr.tools.isNode(target)) {
+      return [target]
+    } else if (sr.tools.isNodeList(target)) {
+      return Array.prototype.slice.call(target)
+    }
+    return []
+  }
+
+  /**
+   * A consistent way of creating unique IDs.
+   * @returns {number}
+   */
+  function _nextUid () {
+    return ++sr.uid
+  }
+
+  function _configure (elem, config, container) {
+    // If a container was passed as a part of the config object,
+    // let’s overwrite it with the resolved container passed in.
+    if (config.container) config.container = container
+    // If the element hasn’t already been configured, let’s use a clone of the
+    // defaults extended by the configuration passed as the second argument.
+    if (!elem.config) {
+      elem.config = sr.tools.extendClone(sr.defaults, config)
+    } else {
+      // Otherwise, let’s use a clone of the existing element configuration extended
+      // by the configuration passed as the second argument.
+      elem.config = sr.tools.extendClone(elem.config, config)
+    }
+
+    // Infer CSS Transform axis from origin string.
+    if (elem.config.origin === 'top' || elem.config.origin === 'bottom') {
+      elem.config.axis = 'Y'
+    } else {
+      elem.config.axis = 'X'
+    }
+  }
+
+  function _style (elem) {
+    var computed = window.getComputedStyle(elem.domEl)
+
+    if (!elem.styles) {
+      elem.styles = {
+        transition: {},
+        transform: {},
+        computed: {}
+      }
+
+      // Capture any existing inline styles, and add our visibility override.
+      // --
+      // See section 4.2. in the Documentation:
+      // https://github.com/jlmakes/scrollreveal.js#42-improve-user-experience
+      elem.styles.inline = elem.domEl.getAttribute('style') || ''
+      elem.styles.inline += '; visibility: visible; '
+
+      // grab the elements existing opacity.
+      elem.styles.computed.opacity = computed.opacity
+
+      // grab the elements existing transitions.
+      if (!computed.transition || computed.transition === 'all 0s ease 0s') {
+        elem.styles.computed.transition = ''
+      } else {
+        elem.styles.computed.transition = computed.transition + ', '
+      }
+    }
+
+    // Create transition styles
+    elem.styles.transition.instant = _generateTransition(elem, 0)
+    elem.styles.transition.delayed = _generateTransition(elem, elem.config.delay)
+
+    // Generate transform styles, first with the webkit prefix.
+    elem.styles.transform.initial = ' -webkit-transform:'
+    elem.styles.transform.target = ' -webkit-transform:'
+    _generateTransform(elem)
+
+    // And again without any prefix.
+    elem.styles.transform.initial += 'transform:'
+    elem.styles.transform.target += 'transform:'
+    _generateTransform(elem)
+  }
+
+  function _generateTransition (elem, delay) {
+    var config = elem.config
+
+    return '-webkit-transition: ' + elem.styles.computed.transition +
+      '-webkit-transform ' + config.duration / 1000 + 's ' +
+      config.easing + ' ' +
+      delay / 1000 + 's, opacity ' +
+      config.duration / 1000 + 's ' +
+      config.easing + ' ' +
+      delay / 1000 + 's; ' +
+
+      'transition: ' + elem.styles.computed.transition +
+      'transform ' + config.duration / 1000 + 's ' +
+      config.easing + ' ' +
+      delay / 1000 + 's, opacity ' +
+      config.duration / 1000 + 's ' +
+      config.easing + ' ' +
+      delay / 1000 + 's; '
+  }
+
+  function _generateTransform (elem) {
+    var config = elem.config
+    var cssDistance
+    var transform = elem.styles.transform
+
+    // Let’s make sure our our pixel distances are negative for top and left.
+    // e.g. origin = 'top' and distance = '25px' starts at `top: -25px` in CSS.
+    if (config.origin === 'top' || config.origin === 'left') {
+      cssDistance = /^-/.test(config.distance)
+        ? config.distance.substr(1)
+        : '-' + config.distance
+    } else {
+      cssDistance = config.distance
+    }
+
+    if (parseInt(config.distance)) {
+      transform.initial += ' translate' + config.axis + '(' + cssDistance + ')'
+      transform.target += ' translate' + config.axis + '(0)'
+    }
+    if (config.scale) {
+      transform.initial += ' scale(' + config.scale + ')'
+      transform.target += ' scale(1)'
+    }
+    if (config.rotate.x) {
+      transform.initial += ' rotateX(' + config.rotate.x + 'deg)'
+      transform.target += ' rotateX(0)'
+    }
+    if (config.rotate.y) {
+      transform.initial += ' rotateY(' + config.rotate.y + 'deg)'
+      transform.target += ' rotateY(0)'
+    }
+    if (config.rotate.z) {
+      transform.initial += ' rotateZ(' + config.rotate.z + 'deg)'
+      transform.target += ' rotateZ(0)'
+    }
+    transform.initial += '; opacity: ' + config.opacity + ';'
+    transform.target += '; opacity: ' + elem.styles.computed.opacity + ';'
+  }
+
+  function _updateStore (elem) {
+    var container = elem.config.container
+
+    // If this element’s container isn’t already in the store, let’s add it.
+    if (container && sr.store.containers.indexOf(container) === -1) {
+      sr.store.containers.push(elem.config.container)
+    }
+
+    // Update the element stored with our new element.
+    sr.store.elements[elem.id] = elem
+  }
+
+  function _record (target, config, interval) {
+    // Save the `reveal()` arguments that triggered this `_record()` call, so we
+    // can re-trace our steps when calling the `sync()` method.
+    var record = {
+      target: target,
+      config: config,
+      interval: interval
+    }
+    sr.history.push(record)
+  }
+
+  function _init () {
+    if (sr.isSupported()) {
+      // Initial animate call triggers valid reveal animations on first load.
+      // Subsequent animate calls are made inside the event handler.
+      _animate()
+
+      // Then we loop through all container nodes in the store and bind event
+      // listeners to each.
+      for (var i = 0; i < sr.store.containers.length; i++) {
+        sr.store.containers[i].addEventListener('scroll', _handler)
+        sr.store.containers[i].addEventListener('resize', _handler)
+      }
+
+      // Let’s also do a one-time binding of window event listeners.
+      if (!sr.initialized) {
+        window.addEventListener('scroll', _handler)
+        window.addEventListener('resize', _handler)
+        sr.initialized = true
+      }
+    }
+    return sr
+  }
+
+  function _handler () {
+    _requestAnimationFrame(_animate)
+  }
+
+  function _setActiveSequences () {
+    var active
+    var elem
+    var elemId
+    var sequence
+
+    // Loop through all sequences
+    sr.tools.forOwn(sr.sequences, function (sequenceId) {
+      sequence = sr.sequences[sequenceId]
+      active = false
+
+      // For each sequenced elemenet, let’s check visibility and if
+      // any are visible, set it’s sequence to active.
+      for (var i = 0; i < sequence.elemIds.length; i++) {
+        elemId = sequence.elemIds[i]
+        elem = sr.store.elements[elemId]
+        if (_isElemVisible(elem) && !active) {
+          active = true
+        }
+      }
+
+      sequence.active = active
+    })
+  }
+
+  function _animate () {
+    var delayed
+    var elem
+
+    _setActiveSequences()
+
+    // Loop through all elements in the store
+    sr.tools.forOwn(sr.store.elements, function (elemId) {
+      elem = sr.store.elements[elemId]
+      delayed = _shouldUseDelay(elem)
+
+      // Let’s see if we should revealand if so,
+      // trigger the `beforeReveal` callback and
+      // determine whether or not to use delay.
+      if (_shouldReveal(elem)) {
+        elem.config.beforeReveal(elem.domEl)
+        if (delayed) {
+          elem.domEl.setAttribute('style',
+            elem.styles.inline +
+            elem.styles.transform.target +
+            elem.styles.transition.delayed
+          )
+        } else {
+          elem.domEl.setAttribute('style',
+            elem.styles.inline +
+            elem.styles.transform.target +
+            elem.styles.transition.instant
+          )
+        }
+
+        // Let’s queue the `afterReveal` callback
+        // and mark the element as seen and revealing.
+        _queueCallback('reveal', elem, delayed)
+        elem.revealing = true
+        elem.seen = true
+
+        if (elem.sequence) {
+          _queueNextInSequence(elem, delayed)
+        }
+      } else if (_shouldReset(elem)) {
+        //Otherwise reset our element and
+        // trigger the `beforeReset` callback.
+        elem.config.beforeReset(elem.domEl)
+        elem.domEl.setAttribute('style',
+          elem.styles.inline +
+          elem.styles.transform.initial +
+          elem.styles.transition.instant
+        )
+        // And queue the `afterReset` callback.
+        _queueCallback('reset', elem)
+        elem.revealing = false
+      }
+    })
+  }
+
+  function _queueNextInSequence (elem, delayed) {
+    var elapsed = 0
+    var delay = 0
+    var sequence = sr.sequences[elem.sequence.id]
+
+    // We’re processing a sequenced element, so let's block other elements in this sequence.
+    sequence.blocked = true
+
+    // Since we’re triggering animations a part of a sequence after animations on first load,
+    // we need to check for that condition and explicitly add the delay to our timer.
+    if (delayed && elem.config.useDelay === 'onload') {
+      delay = elem.config.delay
+    }
+
+    // If a sequence timer is already running, capture the elapsed time and clear it.
+    if (elem.sequence.timer) {
+      elapsed = Math.abs(elem.sequence.timer.started - new Date())
+      window.clearTimeout(elem.sequence.timer)
+    }
+
+    // Start a new timer.
+    elem.sequence.timer = { started: new Date() }
+    elem.sequence.timer.clock = window.setTimeout(function () {
+      // Sequence interval has passed, so unblock the sequence and re-run the handler.
+      sequence.blocked = false
+      elem.sequence.timer = null
+      _handler()
+    }, Math.abs(sequence.interval) + delay - elapsed)
+  }
+
+  function _queueCallback (type, elem, delayed) {
+    var elapsed = 0
+    var duration = 0
+    var callback = 'after'
+
+    // Check which callback we’re working with.
+    switch (type) {
+      case 'reveal':
+        duration = elem.config.duration
+        if (delayed) {
+          duration += elem.config.delay
+        }
+        callback += 'Reveal'
+        break
+
+      case 'reset':
+        duration = elem.config.duration
+        callback += 'Reset'
+        break
+    }
+
+    // If a timer is already running, capture the elapsed time and clear it.
+    if (elem.timer) {
+      elapsed = Math.abs(elem.timer.started - new Date())
+      window.clearTimeout(elem.timer.clock)
+    }
+
+    // Start a new timer.
+    elem.timer = { started: new Date() }
+    elem.timer.clock = window.setTimeout(function () {
+      // The timer completed, so let’s fire the callback and null the timer.
+      elem.config[callback](elem.domEl)
+      elem.timer = null
+    }, duration - elapsed)
+  }
+
+  function _shouldReveal (elem) {
+    if (elem.sequence) {
+      var sequence = sr.sequences[elem.sequence.id]
+      return sequence.active &&
+        !sequence.blocked &&
+        !elem.revealing &&
+        !elem.disabled
+    }
+    return _isElemVisible(elem) &&
+      !elem.revealing &&
+      !elem.disabled
+  }
+
+  function _shouldUseDelay (elem) {
+    var config = elem.config.useDelay
+    return config === 'always' ||
+      (config === 'onload' && !sr.initialized) ||
+      (config === 'once' && !elem.seen)
+  }
+
+  function _shouldReset (elem) {
+    if (elem.sequence) {
+      var sequence = sr.sequences[elem.sequence.id]
+      return !sequence.active &&
+        elem.config.reset &&
+        elem.revealing &&
+        !elem.disabled
+    }
+    return !_isElemVisible(elem) &&
+      elem.config.reset &&
+      elem.revealing &&
+      !elem.disabled
+  }
+
+  function _getContainer (container) {
+    return {
+      width: container.clientWidth,
+      height: container.clientHeight
+    }
+  }
+
+  function _getScrolled (container) {
+    // Return the container scroll values, plus the its offset.
+    if (container && container !== window.document.documentElement) {
+      var offset = _getOffset(container)
+      return {
+        x: container.scrollLeft + offset.left,
+        y: container.scrollTop + offset.top
+      }
+    } else {
+      // Otherwise, default to the window object’s scroll values.
+      return {
+        x: window.pageXOffset,
+        y: window.pageYOffset
+      }
+    }
+  }
+
+  function _getOffset (domEl) {
+    var offsetTop = 0
+    var offsetLeft = 0
+
+      // Grab the element’s dimensions.
+    var offsetHeight = domEl.offsetHeight
+    var offsetWidth = domEl.offsetWidth
+
+    // Now calculate the distance between the element and its parent, then
+    // again for the parent to its parent, and again etc... until we have the
+    // total distance of the element to the document’s top and left origin.
+    do {
+      if (!isNaN(domEl.offsetTop)) {
+        offsetTop += domEl.offsetTop
+      }
+      if (!isNaN(domEl.offsetLeft)) {
+        offsetLeft += domEl.offsetLeft
+      }
+      domEl = domEl.offsetParent
+    } while (domEl)
+
+    return {
+      top: offsetTop,
+      left: offsetLeft,
+      height: offsetHeight,
+      width: offsetWidth
+    }
+  }
+
+  function _isElemVisible (elem) {
+    var offset = _getOffset(elem.domEl)
+    var container = _getContainer(elem.config.container)
+    var scrolled = _getScrolled(elem.config.container)
+    var vF = elem.config.viewFactor
+
+      // Define the element geometry.
+    var elemHeight = offset.height
+    var elemWidth = offset.width
+    var elemTop = offset.top
+    var elemLeft = offset.left
+    var elemBottom = elemTop + elemHeight
+    var elemRight = elemLeft + elemWidth
+
+    return confirmBounds() || isPositionFixed()
+
+    function confirmBounds () {
+      // Define the element’s functional boundaries using its view factor.
+      var top = elemTop + elemHeight * vF
+      var left = elemLeft + elemWidth * vF
+      var bottom = elemBottom - elemHeight * vF
+      var right = elemRight - elemWidth * vF
+
+      // Define the container functional boundaries using its view offset.
+      var viewTop = scrolled.y + elem.config.viewOffset.top
+      var viewLeft = scrolled.x + elem.config.viewOffset.left
+      var viewBottom = scrolled.y - elem.config.viewOffset.bottom + container.height
+      var viewRight = scrolled.x - elem.config.viewOffset.right + container.width
+
+      return top < viewBottom &&
+        bottom > viewTop &&
+        left > viewLeft &&
+        right < viewRight
+    }
+
+    function isPositionFixed () {
+      return (window.getComputedStyle(elem.domEl).position === 'fixed')
+    }
+  }
+
+  /**
+   * Utilities
+   * ---------
+   */
+
+  function Tools () {}
+
+  Tools.prototype.isObject = function (object) {
+    return object !== null && typeof object === 'object' && object.constructor === Object
+  }
+
+  Tools.prototype.isNode = function (object) {
+    return typeof window.Node === 'object'
+      ? object instanceof window.Node
+      : object && typeof object === 'object' &&
+        typeof object.nodeType === 'number' &&
+        typeof object.nodeName === 'string'
+  }
+
+  Tools.prototype.isNodeList = function (object) {
+    var prototypeToString = Object.prototype.toString.call(object)
+    var regex = /^\[object (HTMLCollection|NodeList|Object)\]$/
+
+    return typeof window.NodeList === 'object'
+      ? object instanceof window.NodeList
+      : object && typeof object === 'object' &&
+        regex.test(prototypeToString) &&
+        typeof object.length === 'number' &&
+        (object.length === 0 || this.isNode(object[0]))
+  }
+
+  Tools.prototype.forOwn = function (object, callback) {
+    if (!this.isObject(object)) {
+      throw new TypeError('Expected "object", but received "' + typeof object + '".')
+    } else {
+      for (var property in object) {
+        if (object.hasOwnProperty(property)) {
+          callback(property)
+        }
+      }
+    }
+  }
+
+  Tools.prototype.extend = function (target, source) {
+    this.forOwn(source, function (property) {
+      if (this.isObject(source[property])) {
+        if (!target[property] || !this.isObject(target[property])) {
+          target[property] = {}
+        }
+        this.extend(target[property], source[property])
+      } else {
+        target[property] = source[property]
+      }
+    }.bind(this))
+    return target
+  }
+
+  Tools.prototype.extendClone = function (target, source) {
+    return this.extend(this.extend({}, target), source)
+  }
+
+  Tools.prototype.isMobile = function () {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  }
+
+  /**
+   * Polyfills
+   * --------
+   */
+
+  _requestAnimationFrame = window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    function (callback) {
+      window.setTimeout(callback, 1000 / 60)
+    }
+
+  /**
+   * Module Wrapper
+   * --------------
+   */
+  if (typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
+    define(function () {
+      return ScrollReveal
+    })
+  } else if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ScrollReveal
+  } else {
+    window.ScrollReveal = ScrollReveal
+  }
+}())
+
+},{}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12057,7 +12919,7 @@ var validator = {
 
 exports.default = validator;
 module.exports = exports['default'];
-},{"./lib/blacklist":6,"./lib/contains":7,"./lib/equals":8,"./lib/escape":9,"./lib/isAfter":10,"./lib/isAlpha":11,"./lib/isAlphanumeric":12,"./lib/isAscii":13,"./lib/isBase64":14,"./lib/isBefore":15,"./lib/isBoolean":16,"./lib/isByteLength":17,"./lib/isCreditCard":18,"./lib/isCurrency":19,"./lib/isDataURI":20,"./lib/isDate":21,"./lib/isDecimal":22,"./lib/isDivisibleBy":23,"./lib/isEmail":24,"./lib/isFQDN":25,"./lib/isFloat":26,"./lib/isFullWidth":27,"./lib/isHalfWidth":28,"./lib/isHexColor":29,"./lib/isHexadecimal":30,"./lib/isIP":31,"./lib/isISBN":32,"./lib/isISIN":33,"./lib/isISO8601":34,"./lib/isIn":35,"./lib/isInt":36,"./lib/isJSON":37,"./lib/isLength":38,"./lib/isLowercase":39,"./lib/isMACAddress":40,"./lib/isMobilePhone":41,"./lib/isMongoId":42,"./lib/isMultibyte":43,"./lib/isNull":44,"./lib/isNumeric":45,"./lib/isSurrogatePair":46,"./lib/isURL":47,"./lib/isUUID":48,"./lib/isUppercase":49,"./lib/isVariableWidth":50,"./lib/isWhitelisted":51,"./lib/ltrim":52,"./lib/matches":53,"./lib/normalizeEmail":54,"./lib/rtrim":55,"./lib/stripLow":56,"./lib/toBoolean":57,"./lib/toDate":58,"./lib/toFloat":59,"./lib/toInt":60,"./lib/trim":61,"./lib/unescape":62,"./lib/util/toString":65,"./lib/whitelist":66}],5:[function(require,module,exports){
+},{"./lib/blacklist":7,"./lib/contains":8,"./lib/equals":9,"./lib/escape":10,"./lib/isAfter":11,"./lib/isAlpha":12,"./lib/isAlphanumeric":13,"./lib/isAscii":14,"./lib/isBase64":15,"./lib/isBefore":16,"./lib/isBoolean":17,"./lib/isByteLength":18,"./lib/isCreditCard":19,"./lib/isCurrency":20,"./lib/isDataURI":21,"./lib/isDate":22,"./lib/isDecimal":23,"./lib/isDivisibleBy":24,"./lib/isEmail":25,"./lib/isFQDN":26,"./lib/isFloat":27,"./lib/isFullWidth":28,"./lib/isHalfWidth":29,"./lib/isHexColor":30,"./lib/isHexadecimal":31,"./lib/isIP":32,"./lib/isISBN":33,"./lib/isISIN":34,"./lib/isISO8601":35,"./lib/isIn":36,"./lib/isInt":37,"./lib/isJSON":38,"./lib/isLength":39,"./lib/isLowercase":40,"./lib/isMACAddress":41,"./lib/isMobilePhone":42,"./lib/isMongoId":43,"./lib/isMultibyte":44,"./lib/isNull":45,"./lib/isNumeric":46,"./lib/isSurrogatePair":47,"./lib/isURL":48,"./lib/isUUID":49,"./lib/isUppercase":50,"./lib/isVariableWidth":51,"./lib/isWhitelisted":52,"./lib/ltrim":53,"./lib/matches":54,"./lib/normalizeEmail":55,"./lib/rtrim":56,"./lib/stripLow":57,"./lib/toBoolean":58,"./lib/toDate":59,"./lib/toFloat":60,"./lib/toInt":61,"./lib/trim":62,"./lib/unescape":63,"./lib/util/toString":66,"./lib/whitelist":67}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12109,7 +12971,7 @@ for (var _locale, _i = 0; _i < arabicLocales.length; _i++) {
   alpha[_locale] = alpha.ar;
   alphanumeric[_locale] = alphanumeric.ar;
 }
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12128,7 +12990,7 @@ function blacklist(str, chars) {
   return str.replace(new RegExp('[' + chars + ']+', 'g'), '');
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],7:[function(require,module,exports){
+},{"./util/assertString":64}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12151,7 +13013,7 @@ function contains(str, elem) {
   return str.indexOf((0, _toString2.default)(elem)) >= 0;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63,"./util/toString":65}],8:[function(require,module,exports){
+},{"./util/assertString":64,"./util/toString":66}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12170,7 +13032,7 @@ function equals(str, comparison) {
   return str === comparison;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],9:[function(require,module,exports){
+},{"./util/assertString":64}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12189,7 +13051,7 @@ function escape(str) {
       return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').replace(/`/g, '&#96;');
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],10:[function(require,module,exports){
+},{"./util/assertString":64}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12216,7 +13078,7 @@ function isAfter(str) {
   return !!(original && comparison && original > comparison);
 }
 module.exports = exports['default'];
-},{"./toDate":58,"./util/assertString":63}],11:[function(require,module,exports){
+},{"./toDate":59,"./util/assertString":64}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12242,7 +13104,7 @@ function isAlpha(str) {
   throw new Error('Invalid locale \'' + locale + '\'');
 }
 module.exports = exports['default'];
-},{"./alpha":5,"./util/assertString":63}],12:[function(require,module,exports){
+},{"./alpha":6,"./util/assertString":64}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12268,7 +13130,7 @@ function isAlphanumeric(str) {
   throw new Error('Invalid locale \'' + locale + '\'');
 }
 module.exports = exports['default'];
-},{"./alpha":5,"./util/assertString":63}],13:[function(require,module,exports){
+},{"./alpha":6,"./util/assertString":64}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12291,7 +13153,7 @@ function isAscii(str) {
   return ascii.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],14:[function(require,module,exports){
+},{"./util/assertString":64}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12317,7 +13179,7 @@ function isBase64(str) {
   return firstPaddingChar === -1 || firstPaddingChar === len - 1 || firstPaddingChar === len - 2 && str[len - 1] === '=';
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],15:[function(require,module,exports){
+},{"./util/assertString":64}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12344,7 +13206,7 @@ function isBefore(str) {
   return !!(original && comparison && original < comparison);
 }
 module.exports = exports['default'];
-},{"./toDate":58,"./util/assertString":63}],16:[function(require,module,exports){
+},{"./toDate":59,"./util/assertString":64}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12363,7 +13225,7 @@ function isBoolean(str) {
   return ['true', 'false', '1', '0'].indexOf(str) >= 0;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],17:[function(require,module,exports){
+},{"./util/assertString":64}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12397,7 +13259,7 @@ function isByteLength(str, options) {
   return len >= min && (typeof max === 'undefined' || len <= max);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],18:[function(require,module,exports){
+},{"./util/assertString":64}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12443,7 +13305,7 @@ function isCreditCard(str) {
   return !!(sum % 10 === 0 ? sanitized : false);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],19:[function(require,module,exports){
+},{"./util/assertString":64}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12532,7 +13394,7 @@ function isCurrency(str, options) {
   return currencyRegex(options).test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63,"./util/merge":64}],20:[function(require,module,exports){
+},{"./util/assertString":64,"./util/merge":65}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12553,7 +13415,7 @@ function isDataURI(str) {
   return dataURI.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],21:[function(require,module,exports){
+},{"./util/assertString":64}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12654,7 +13516,7 @@ function isDate(str) {
   return false;
 }
 module.exports = exports['default'];
-},{"./isISO8601":34,"./util/assertString":63}],22:[function(require,module,exports){
+},{"./isISO8601":35,"./util/assertString":64}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12675,7 +13537,7 @@ function isDecimal(str) {
   return str !== '' && decimal.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],23:[function(require,module,exports){
+},{"./util/assertString":64}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12698,7 +13560,7 @@ function isDivisibleBy(str, num) {
   return (0, _toFloat2.default)(str) % parseInt(num, 10) === 0;
 }
 module.exports = exports['default'];
-},{"./toFloat":59,"./util/assertString":63}],24:[function(require,module,exports){
+},{"./toFloat":60,"./util/assertString":64}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12785,7 +13647,7 @@ function isEmail(str, options) {
   return true;
 }
 module.exports = exports['default'];
-},{"./isByteLength":17,"./isFQDN":25,"./util/assertString":63,"./util/merge":64}],25:[function(require,module,exports){
+},{"./isByteLength":18,"./isFQDN":26,"./util/assertString":64,"./util/merge":65}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12843,7 +13705,7 @@ function isFDQN(str, options) {
   return true;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63,"./util/merge":64}],26:[function(require,module,exports){
+},{"./util/assertString":64,"./util/merge":65}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12868,7 +13730,7 @@ function isFloat(str, options) {
   return float.test(str) && (!options.hasOwnProperty('min') || str >= options.min) && (!options.hasOwnProperty('max') || str <= options.max);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],27:[function(require,module,exports){
+},{"./util/assertString":64}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12889,7 +13751,7 @@ function isFullWidth(str) {
   (0, _assertString2.default)(str);
   return fullWidth.test(str);
 }
-},{"./util/assertString":63}],28:[function(require,module,exports){
+},{"./util/assertString":64}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12910,7 +13772,7 @@ function isHalfWidth(str) {
   (0, _assertString2.default)(str);
   return halfWidth.test(str);
 }
-},{"./util/assertString":63}],29:[function(require,module,exports){
+},{"./util/assertString":64}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12931,7 +13793,7 @@ function isHexColor(str) {
   return hexcolor.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],30:[function(require,module,exports){
+},{"./util/assertString":64}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12952,7 +13814,7 @@ function isHexadecimal(str) {
   return hexadecimal.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],31:[function(require,module,exports){
+},{"./util/assertString":64}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13034,7 +13896,7 @@ function isIP(str) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],32:[function(require,module,exports){
+},{"./util/assertString":64}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13092,7 +13954,7 @@ function isISBN(str) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],33:[function(require,module,exports){
+},{"./util/assertString":64}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13141,7 +14003,7 @@ function isISIN(str) {
   return parseInt(str.substr(str.length - 1), 10) === (10000 - sum) % 10;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],34:[function(require,module,exports){
+},{"./util/assertString":64}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13164,7 +14026,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // from http://goo.gl/0ejHHW
 var iso8601 = exports.iso8601 = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
 /* eslint-enable max-len */
-},{"./util/assertString":63}],35:[function(require,module,exports){
+},{"./util/assertString":64}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13204,7 +14066,7 @@ function isIn(str, options) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63,"./util/toString":65}],36:[function(require,module,exports){
+},{"./util/assertString":64,"./util/toString":66}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13236,7 +14098,7 @@ function isInt(str, options) {
   return regex.test(str) && minCheckPassed && maxCheckPassed;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],37:[function(require,module,exports){
+},{"./util/assertString":64}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13262,7 +14124,7 @@ function isJSON(str) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],38:[function(require,module,exports){
+},{"./util/assertString":64}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13297,7 +14159,7 @@ function isLength(str, options) {
   return len >= min && (typeof max === 'undefined' || len <= max);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],39:[function(require,module,exports){
+},{"./util/assertString":64}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13316,7 +14178,7 @@ function isLowercase(str) {
   return str === str.toLowerCase();
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],40:[function(require,module,exports){
+},{"./util/assertString":64}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13337,7 +14199,7 @@ function isMACAddress(str) {
   return macAddress.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],41:[function(require,module,exports){
+},{"./util/assertString":64}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13396,7 +14258,7 @@ function isMobilePhone(str, locale) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],42:[function(require,module,exports){
+},{"./util/assertString":64}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13419,7 +14281,7 @@ function isMongoId(str) {
   return (0, _isHexadecimal2.default)(str) && str.length === 24;
 }
 module.exports = exports['default'];
-},{"./isHexadecimal":30,"./util/assertString":63}],43:[function(require,module,exports){
+},{"./isHexadecimal":31,"./util/assertString":64}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13442,7 +14304,7 @@ function isMultibyte(str) {
   return multibyte.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],44:[function(require,module,exports){
+},{"./util/assertString":64}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13461,7 +14323,7 @@ function isNull(str) {
   return str.length === 0;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],45:[function(require,module,exports){
+},{"./util/assertString":64}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13482,7 +14344,7 @@ function isNumeric(str) {
   return numeric.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],46:[function(require,module,exports){
+},{"./util/assertString":64}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13503,7 +14365,7 @@ function isSurrogatePair(str) {
   return surrogatePair.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],47:[function(require,module,exports){
+},{"./util/assertString":64}],48:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13606,7 +14468,7 @@ function isURL(url, options) {
   return true;
 }
 module.exports = exports['default'];
-},{"./isFQDN":25,"./isIP":31,"./util/assertString":63,"./util/merge":64}],48:[function(require,module,exports){
+},{"./isFQDN":26,"./isIP":32,"./util/assertString":64,"./util/merge":65}],49:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13635,7 +14497,7 @@ function isUUID(str) {
   return pattern && pattern.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],49:[function(require,module,exports){
+},{"./util/assertString":64}],50:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13654,7 +14516,7 @@ function isUppercase(str) {
   return str === str.toUpperCase();
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],50:[function(require,module,exports){
+},{"./util/assertString":64}],51:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13677,7 +14539,7 @@ function isVariableWidth(str) {
   return _isFullWidth.fullWidth.test(str) && _isHalfWidth.halfWidth.test(str);
 }
 module.exports = exports['default'];
-},{"./isFullWidth":27,"./isHalfWidth":28,"./util/assertString":63}],51:[function(require,module,exports){
+},{"./isFullWidth":28,"./isHalfWidth":29,"./util/assertString":64}],52:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13701,7 +14563,7 @@ function isWhitelisted(str, chars) {
   return true;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],52:[function(require,module,exports){
+},{"./util/assertString":64}],53:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13721,7 +14583,7 @@ function ltrim(str, chars) {
   return str.replace(pattern, '');
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],53:[function(require,module,exports){
+},{"./util/assertString":64}],54:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13743,7 +14605,7 @@ function matches(str, pattern, modifiers) {
   return pattern.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],54:[function(require,module,exports){
+},{"./util/assertString":64}],55:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13792,7 +14654,7 @@ function normalizeEmail(email, options) {
   return parts.join('@');
 }
 module.exports = exports['default'];
-},{"./isEmail":24,"./util/merge":64}],55:[function(require,module,exports){
+},{"./isEmail":25,"./util/merge":65}],56:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13818,7 +14680,7 @@ function rtrim(str, chars) {
   return idx < str.length ? str.substr(0, idx + 1) : str;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],56:[function(require,module,exports){
+},{"./util/assertString":64}],57:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13842,7 +14704,7 @@ function stripLow(str, keep_new_lines) {
   return (0, _blacklist2.default)(str, chars);
 }
 module.exports = exports['default'];
-},{"./blacklist":6,"./util/assertString":63}],57:[function(require,module,exports){
+},{"./blacklist":7,"./util/assertString":64}],58:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13864,7 +14726,7 @@ function toBoolean(str, strict) {
   return str !== '0' && str !== 'false' && str !== '';
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],58:[function(require,module,exports){
+},{"./util/assertString":64}],59:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13884,7 +14746,7 @@ function toDate(date) {
   return !isNaN(date) ? new Date(date) : null;
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],59:[function(require,module,exports){
+},{"./util/assertString":64}],60:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13903,7 +14765,7 @@ function toFloat(str) {
   return parseFloat(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],60:[function(require,module,exports){
+},{"./util/assertString":64}],61:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13922,7 +14784,7 @@ function toInt(str, radix) {
   return parseInt(str, radix || 10);
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],61:[function(require,module,exports){
+},{"./util/assertString":64}],62:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13944,7 +14806,7 @@ function trim(str, chars) {
   return (0, _rtrim2.default)((0, _ltrim2.default)(str, chars), chars);
 }
 module.exports = exports['default'];
-},{"./ltrim":52,"./rtrim":55}],62:[function(require,module,exports){
+},{"./ltrim":53,"./rtrim":56}],63:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13963,7 +14825,7 @@ function unescape(str) {
       return str.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#x2F;/g, '/').replace(/&#96;/g, '`');
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],63:[function(require,module,exports){
+},{"./util/assertString":64}],64:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13976,7 +14838,7 @@ function assertString(input) {
   }
 }
 module.exports = exports['default'];
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -13995,7 +14857,7 @@ function merge() {
   return obj;
 }
 module.exports = exports['default'];
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -14018,7 +14880,7 @@ function toString(input) {
   return String(input);
 }
 module.exports = exports['default'];
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -14037,7 +14899,7 @@ function whitelist(str, chars) {
   return str.replace(new RegExp('[^' + chars + ']+', 'g'), '');
 }
 module.exports = exports['default'];
-},{"./util/assertString":63}],67:[function(require,module,exports){
+},{"./util/assertString":64}],68:[function(require,module,exports){
 var uiBootstrap = require('angular-ui-bootstrap');
 var helloWorldControllers = angular.module('helloWorldApp.controllers',[]);
 var helloWorldAppServices = angular.module('helloWorldApp.services',[]);
@@ -14070,7 +14932,7 @@ angular.module('helloWorldApp',['ngRoute','helloWorldApp.controllers', 'helloWor
 	})
 	.otherwise({redirectTo: '/'});
 });
-},{"./controllers/chat/ChatCtrl.js":68,"./controllers/friends/FriendsListCtrl.js":69,"./controllers/home/HomeCtrl.js":70,"./services/ChatService.js":71,"./services/FriendsService.js":72,"./services/HomeService.js":73,"./services/PrimusService.js":74,"./services/UserService.js":75,"angular-ui-bootstrap":2}],68:[function(require,module,exports){
+},{"./controllers/chat/ChatCtrl.js":69,"./controllers/friends/FriendsListCtrl.js":70,"./controllers/home/HomeCtrl.js":71,"./services/ChatService.js":72,"./services/FriendsService.js":73,"./services/HomeService.js":74,"./services/PrimusService.js":75,"./services/UserService.js":76,"angular-ui-bootstrap":2}],69:[function(require,module,exports){
 var moment = require('moment');
 
 module.exports = function(module){
@@ -14136,10 +14998,11 @@ module.exports = function(module){
 			$scope.listMyMessages();
 		}
 
+		
 	}]);
 };
 
-},{"moment":3}],69:[function(require,module,exports){
+},{"moment":3}],70:[function(require,module,exports){
 module.exports = function(module){
 	module.controller('FriendsListCtrl', ['$scope', '$window','UserService', 'FriendsService', function($scope,$window,UserService, FriendsService){
 		$scope.users = {};
@@ -14211,8 +15074,10 @@ module.exports = function(module){
 
 	}]);
 };
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 var validator  = require('validator');
+var ScrollReveal = require('scrollreveal');
+
 module.exports = function(module){
 	module.controller('HomeCtrl', ['$scope', '$route', 'UserService','$window', '$uibModal', function($scope, $route, UserService, $window,$uibModal){
 		console.log('This is the main controller');
@@ -14247,6 +15112,10 @@ module.exports = function(module){
 			});	
 		};
 
+		var sr = ScrollReveal();
+        $scope.$on("$viewContentLoaded", function () {
+			sr.reveal('.number');
+        });
 		
 	}]);
 
@@ -14267,6 +15136,7 @@ module.exports = function(module){
 		$ctrl.login = function(){
 			validateLogin();
 
+			$ctrl.validInputs = true;
 			if($ctrl.checkingUsername === false){
 				$ctrl.validUsername = false;
 				$ctrl.validInputs = false;
@@ -14352,7 +15222,7 @@ module.exports = function(module){
 
 };
 
-},{"validator":4}],71:[function(require,module,exports){
+},{"scrollreveal":4,"validator":5}],72:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('ChatService', ['$http', '$q', 'UserService', function($http, $q, UserService){
 		var service = {};
@@ -14400,7 +15270,7 @@ module.exports = function(module){
 		return service;
 	}]);
 };
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('FriendsService',['$http', '$q', '$window','$route','UserService',function($http, $q, $window,$route,UserService){
 		var service = {};
@@ -14524,7 +15394,7 @@ module.exports = function(module){
 		return service;
 	}]);
 };
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('HomeService', ['$http', '$q','$window' ,function($http, $q, $window){
 		var service = {};
@@ -14533,7 +15403,7 @@ module.exports = function(module){
 	}]);
 };
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 
 
 module.exports = function(module){
@@ -14557,7 +15427,7 @@ module.exports = function(module){
 		return primus;
 	}]);
 };
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 module.exports = function(module){
 	module.factory('UserService', ['$http', '$q','$window', function($http, $q, $window){
 		var service = {};
@@ -14630,4 +15500,4 @@ module.exports = function(module){
 	}]);
 };
 
-},{}]},{},[67]);
+},{}]},{},[68]);
