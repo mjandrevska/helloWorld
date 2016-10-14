@@ -12,6 +12,7 @@ app.use(express.static('public'));
 app.use(cookieSession({
   	name: 'session',
 	secret: 'keyboard cat',
+	maxAge: 999999999999999999999999
 }));
 
 app.use(passport.initialize());

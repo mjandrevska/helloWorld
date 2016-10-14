@@ -105,6 +105,7 @@ module.exports = function(module){
 	  	$signupCtrl.signup = function(){
 			validateInputs();
 
+			$signupCtrl.validInputs = true;
 			if($signupCtrl.checkName === false){
 				$signupCtrl.validName = false;
 				$signupCtrl.validInputs = false;

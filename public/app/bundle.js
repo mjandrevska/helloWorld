@@ -14942,6 +14942,11 @@ module.exports = function(module){
 		$scope.messages = [];
 		$scope.UserService = UserService;
 
+		/*$scope.$on("$viewContentLoaded", function(){
+			var scrollence = document.getElementById('commentTxtArea');
+			scrollence.scrollTop();			
+		});*/
+		
 		$scope.logout = function(){
 			UserService.logout()
 			.then(function(res){
@@ -14974,7 +14979,9 @@ module.exports = function(module){
 		};
 
 		$scope.getMyFriends = function(){
+			console.log(FriendsService);
 			FriendsService.getMyFriends()
+
 			.then(function(result){
 				$scope.myFriends = result;
 			}, function(error){
@@ -14997,7 +15004,6 @@ module.exports = function(module){
 		if($routeParams.id){
 			$scope.listMyMessages();
 		}
-
 		
 	}]);
 };
@@ -15182,6 +15188,7 @@ module.exports = function(module){
 	  	$signupCtrl.signup = function(){
 			validateInputs();
 
+			$signupCtrl.validInputs = true;
 			if($signupCtrl.checkName === false){
 				$signupCtrl.validName = false;
 				$signupCtrl.validInputs = false;
