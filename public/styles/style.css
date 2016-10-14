@@ -273,3 +273,8 @@ a:hover, a:visited, a:active, a:focus{
 	padding: 10px;
 	margin: 10px;
 }
+
+.animation {
+  -webkit-animation-duration: 4s;
+  -webkit-animation-delay: 2s;
+}
