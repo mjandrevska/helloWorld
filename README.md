@@ -10,9 +10,6 @@ Please read the instructions below.
 
 You will need to run mongod
 
-```
-Give examples
-```
 
 ### Installing
 
@@ -25,8 +22,18 @@ npm install
 ```
 bower install
 ```
+```
+npm install browserify watchify -g
+```
 
-in order to install its dependencies
+in order to install its dependencies.
+
+Also, please be sure to open a new terminal tab and navigate to the /public/app folder. Then run:
+```
+watchify app.js -o bundle.js
+```
+This command start watchify and looks for any changes in the code.
+
 
 2. After completing step 1, navigate to the root directory of the project and run:
 	```
@@ -44,7 +51,6 @@ If you chose 2.a, the tests will finish quickly and you can proceed to step 2.b 
 If you chose 2.b, Congratulations - you started the server. 
 Please go to browser and you will be able to see the application, which can be accessed on localhost:3000
 
-Also, please be sure to open a new terminal tab and navigate to the /public/app folder. Then, run watchify app.js -o bundle.js. This command start watchify and looks for any changes in the code.
 
 You can login if you already have an existing account, or you can register yourself in order to be able to navigate to the actual chat.
 
@@ -55,6 +61,13 @@ You can run the tests from the root directory with the following command:
 ```
 npm test
 ```
+
+## Configuration
+The configuration files can be found in the /config/env folder. In these files, the database and the port on which the application will run can be set up.
+
+The /config/env/test.js file containes the configuration for the test running. My test database is called hello_world_test.
+The /config/env/development.js file containes the configuration for the development environment. My development database is called hello_world_dev.
+The /confg/env/all.js file containes the default configuration for all environments.
 
 ## Built With
 
