@@ -100,7 +100,7 @@ module.exports = {
 	deleteFriendship: function(req, res, next){
 		var friend;
 		console.log('Delete friendship');
-		Friendships.remove({id: req.params.id}, function(err){
+		Friendships.remove({_id: req.params.id}, function(err){
 			if(err){
 				console.log('Error while deleting a friendship');
 				return res.status();
