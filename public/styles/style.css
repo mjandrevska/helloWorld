@@ -8,7 +8,7 @@ body{
 }
 
 .friendsListContainer{
-	height: 100%;
+	height: calc(100% - 52px);
 }
 
 .friendsListRow{
@@ -32,7 +32,30 @@ body{
 }
 .homepageBackground{
 	background-image: url('../img/frontpage.jpg') no-repeat center center;
-	background-size: contain;
+	background-size: cover;
+}
+
+.headerBackground{
+	position: absolute;
+  	top: 50%;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+  	color: white;
+ 	text-align: center;
+}
+
+.introTextBackground{
+	font-size: 60px;
+	color: #FFF;
+	margin: 0;
+	font-weight: bold;
+	text-transform: uppercase;
+	white-space: nowrap;
+}	
+
+.introParagraphBackground{
+	padding: 20px;
+	font-size: 20px;
 }
 
 .bg{
@@ -186,9 +209,15 @@ img.friendsListIcon{
 
 .messagePanel{
 	background-color: #F2F2F2;
+	/*height: calc(100% - 52px);*/
 	height: 100%;
-	overflow: auto;
 	padding: 15px;
+}
+
+.msgContainer {
+	height: 65%;
+	overflow-y: scroll;
+	overflow-x: hidden;
 }
 
 .friendName{
@@ -273,3 +302,4 @@ a:hover, a:visited, a:active, a:focus{
 	padding: 10px;
 	margin: 10px;
 }
+

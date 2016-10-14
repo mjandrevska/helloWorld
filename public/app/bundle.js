@@ -14941,11 +14941,6 @@ module.exports = function(module){
 		$scope.myFriends = {};
 		$scope.messages = [];
 		$scope.UserService = UserService;
-
-		/*$scope.$on("$viewContentLoaded", function(){
-			var scrollence = document.getElementById('commentTxtArea');
-			scrollence.scrollTop();			
-		});*/
 		
 		$scope.logout = function(){
 			UserService.logout()
@@ -14995,6 +14990,11 @@ module.exports = function(module){
 			ChatService.listMessages($routeParams.id)
 			.then(function(result){
 				$scope.messages = ChatService.messages;
+				var scrollence = document.getElementById('rightContainer');
+				setTimeout(function(){
+					scrollence.scrollTop = 100000000000000;
+				}, 100);
+
 			}, function(error){
 				console.log('Error for listing the messages');
 			});
